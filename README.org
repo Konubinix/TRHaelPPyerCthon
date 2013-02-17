@@ -1,0 +1,70 @@
+* TRHaelPPyerCthon: The Happy Trac RPC Python Helper
+  TRHaelPPyerCthon is a set of functions to help you with be fast with trac management. It is basically a wrapper around the awesome [[http://trac-hacks.org/wiki/XmlRpcPlugin][xml rpc plugin for trac]] to perform meaningful tasks in one command.
+
+  It is provided with TracCmd, a CLI application using it to have an interactive manipulation of trac.
+
+  The fulfilled needs are:
+  - easy to use,
+  - usable in a stateless work-flow: each command may be called independently of the others,
+  - allows fast manipulation of common tasks:
+    - the fewer commands as possible to do anything,
+    - allow commands to act on batches of objects (ticket, wiki page etc.).
+  - customisable: it should provides hooks to be run in several places to allow the user to adapt it to his needs,
+
+  TRHaelPPyerCthon is first of all a way for me to understand the trac xml rpc plugin. It may be more interesting to take a look at [[http://code.google.com/p/tracshell/][tracshell]] for something better suited to your needs.
+
+  The name was chosen after the following:
+  #+BEGIN_EXAMPLE
+  Ha  ppy
+Tr a       c
+ R    P    C
+       Py   thon
+  H elp  er
+----------------
+TRFHaelPPyerCthon
+  #+END_EXAMPLE
+  It does not make a lot of sense, but I like it.
+* How to use
+  :LOGBOOK:
+  - Captured       [2013-02-17 dim. 12:05]
+  :END:
+  Using only the TPH:
+  #+BEGIN_SRC python
+    from trhaelppyercthon import TPH
+    import xmlrpclib
+
+    server = xmlrpclib.ServerProxy("trac_url")
+    tph = TPH(server)
+    tph.edit(135)
+  #+END_SRC
+  Or, if you prefer a more interactive example:
+  #+BEGIN_SRC python
+    from trac_cmd import TracCmd
+    import xmlrpclib
+
+    server = xmlrpclib.ServerProxy("trac_url")
+    cmd = TracCmd(server)
+    cmd.cmdloop()
+  #+END_SRC
+* Alternatives
+  :LOGBOOK:
+  - Captured       [2013-02-17 dim. 19:17]
+  :END:
+** SD
+   :LOGBOOK:
+   - Captured       [2013-02-17 dim. 19:17]
+   :END:
+   [[http://search.cpan.org/dist/App-SD/][SD]], the peer-to-peer bug tracker, looks terrific at first glance. Nonetheless, I did not manage to get the trac clone command work and I could not find any help in the irc chan. Moreover, it uses perl, that looks quite hard to read and understand.
+** tracshell
+   :LOGBOOK:
+   - Captured       [2013-02-17 dim. 19:20]
+   :END:
+   [[http://code.google.com/p/tracshell/][tracshell]] seems to do quite the same thing than TracCmd in spirit. I have not dug into its code, but it might already do everything that trhaelppyercthon does, and maybe better.
+* config                                                            :ARCHIVE:
+  :LOGBOOK:
+  - Captured       [2013-02-17 dim. 11:59]
+  :END:
+
+# Local Variables:
+# ispell-dictionary: "british"
+# End:
