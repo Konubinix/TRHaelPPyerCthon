@@ -187,7 +187,7 @@ class TracCmd(cmd.Cmd):
         print self.tph.server.ticket.getActions(int(ticket))
 
     def do_verbatim(self, line):
-        exec("print self.tph.server.%s" % line)
+        exec("self.pp.pprint(self.tph.server.%s" % line + ")")
 
     def do_ticket_edit(self, ticket_number):
         if self.tph.ticket_edit(int(ticket_number)):
