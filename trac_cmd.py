@@ -61,7 +61,8 @@ class TracCmd(cmd.Cmd):
 
     def do_ticket_clone(self, line):
         (ticket_number, attributes, ) = self.ticket_attributes_parse_line(line)
-        new_ticket_number = self.tph.ticket_clone(ticket_number, attributes, True)
+        new_ticket_number = self.tph.ticket_clone(ticket_number, attributes,
+                                                  True, reporter=self.me)
         if new_ticket_number:
             print "Ticket %s, clone of %s, created" % (new_ticket_number,
                                                        ticket_number)
@@ -70,7 +71,10 @@ class TracCmd(cmd.Cmd):
 
     def do_ticket_son_create(self, line):
         (ticket_number, attributes,) = self.ticket_attributes_parse_line(line)
-        new_ticket_number = self.tph.ticket_son_create(ticket_number, attributes, True)
+        new_ticket_number = self.tph.ticket_son_create(ticket_number,
+                                                       attributes,
+                                                       True,
+                                                       reporter=self.me)
         if new_ticket_number:
             print "Ticket %s, son of %s, created" % (new_ticket_number,
                                                      ticket_number)

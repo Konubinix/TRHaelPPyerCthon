@@ -117,9 +117,9 @@ class TPH(object):
             description,
             attributes)
 
-    def ticket_clone(self, ticket_number, attributes, use_editor=False):
+    def ticket_clone(self, ticket_number, attributes, use_editor=False, reporter=""):
         # get the ticket to clone
-        ticket = self.get(ticket_number)
+        ticket = self.ticket_get(ticket_number)
         ticket_attributes = ticket[3]
         # remove what is not relevant in the ticket
         for key in ("changetime", "_ts", "time",):
@@ -127,14 +127,14 @@ class TPH(object):
             # addition of the overriding attributes
             ticket_attributes.update(attributes)
             # I am the new reporter of the ticket
-            ticket_attributes["reporter"] = self.me
+            ticket_attributes["reporter"] = reporter
             #self.pp.pprint(ticket_attributes)
 
         return self.ticket_create(ticket_attributes, use_editor)
 
-    def ticket_son_create(self, ticket_number, attributes, use_editor=False):
+    def ticket_son_create(self, ticket_number, attributes, use_editor=False, reporter=""):
         # get the ticket to clone
-        ticket = self.get(ticket_number)
+        ticket = self.ticket_get(ticket_number)
         ticket_old_attributes = ticket[3]
         # get only the relevant info to copy from the parent ticket
         ticket_attributes = {
@@ -146,7 +146,7 @@ class TPH(object):
             "owner" : ticket_old_attributes["owner"],
             "parents" : "#" + str(ticket[0]),
             "priority" : ticket_old_attributes["priority"],
-            "reporter" : self.me,
+            "reporter" : reporter,
             "summary" : ticket_old_attributes["summary"] + " - Sub ticket",
             "status" : "new",
             "description" : ticket_old_attributes["description"],
@@ -154,6 +154,7 @@ class TPH(object):
         }
         ticket_attributes.update(attributes)
         return self.ticket_create(ticket_attributes, use_editor)
+
     def ticket_batch_set(self, id_list, attributes):
         for id in id_list:
             self.server.ticket.update(int(id),
