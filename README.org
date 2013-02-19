@@ -21,31 +21,67 @@ Tr a       c
        Py   thon
   H elp  er
 ----------------
-TRFHaelPPyerCthon
+TRHaelPPyerCthon
   #+END_EXAMPLE
   It does not make a lot of sense, but I like it.
 * How to use
   :LOGBOOK:
   - Captured       [2013-02-17 dim. 12:05]
   :END:
-  Using only the TPH:
-  #+BEGIN_SRC python
-    from trhaelppyercthon import TPH
-    import xmlrpclib
+  - Get it from the repository.
+  - Set the pythonpath environment variable to point to the cloned repository.
+  - Use it:
+    - You can use it in a python script:
+      - You can use only the TPH:
+        #+BEGIN_SRC python
+          from trhaelppyercthon import TPH
+          import xmlrpclib
 
-    server = xmlrpclib.ServerProxy("trac_url")
-    tph = TPH(server)
-    tph.edit(135)
-  #+END_SRC
-  Or, if you prefer a more interactive example:
-  #+BEGIN_SRC python
-    from trac_cmd import TracCmd
-    import xmlrpclib
+          server = xmlrpclib.ServerProxy("trac_url")
+          tph = TPH(server)
+          tph.edit(135)
+        #+END_SRC
+      - You can subclass the TracCmd:
+        #+BEGIN_SRC python
+          from trac_cmd import TracCmd
+          import xmlrpclib
 
-    server = xmlrpclib.ServerProxy("trac_url")
-    cmd = TracCmd(server)
-    cmd.cmdloop()
-  #+END_SRC
+          class MyTracCmd(TracCmd):
+              def do_my_tickets_stuff(self, line):
+                  self.tph.ticket_create(...)
+
+          server = xmlrpclib.ServerProxy("trac_url")
+          cmd = MyTracCmd(server)
+          cmd.cmdloop()
+         #+END_SRC
+    - Or you can just use trac_cmd.py:
+      - Make the environment variable PATH point to the cloned repository
+      - launch trac_cmd.py
+        #+BEGIN_SRC sh
+          trac_cmd.py
+        #+END_SRC
+
+* Configuration
+  :LOGBOOK:
+  - Captured       [2013-02-18 Mon 17:37]
+  :END:
+  - When trhaelppyercthon needs the user to edit something, it uses the EDITOR environment variable.
+  - The BROWSER environment variable is used by trac_cmd.py to open web pages.
+  - trac_cmd.py uses the TRAC_CMD_TEMPLATE_FILE environment variable to store templates of ticket you often create.
+  - You MUST have the TRAC_CMDRC environment variable pointing to a file describing the information needed to connect to the trac project. It is in conf format and looks like
+    #+BEGIN_SRC conf
+      [server]
+      url=www.trac_example.com # url of the trac web server
+      trac_path=/trac # path to trac from the web server
+      protocol=https # used protocol
+    #+END_SRC
+  - The authentication values are taken from the ~/.netrc file:
+    #+BEGIN_EXAMPLE
+    machine www.trac_example.com
+    login my_login
+    password some_password
+    #+END_EXAMPLE
+
 * Alternatives
   :LOGBOOK:
   - Captured       [2013-02-17 dim. 19:17]
