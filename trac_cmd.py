@@ -15,12 +15,19 @@ import re
 from trhaelppyercthon import TPH
 
 class TracCmd(cmd.Cmd):
-    def __init__(self, server, login="", url=""):
+    def __init__(self, server, login="", url="", template_file=""):
         cmd.Cmd.__init__(self)
         self.tph = TPH(server)
         self.me = login
         self.pp = pprint.PrettyPrinter(indent=4)
         self.url = url
+        self.template_file = template_file \
+                             or \
+                             os.environ.get("TRAC_CMD_TEMPLATE_FILE", "")
+        if self.template_file \
+           and \
+           os.path.exists(self.template_file):
+            self.tph.template_open(self.template_file)
 
     def do_method_list(self, line):
         for method in self.tph.server.system.listMethods():
