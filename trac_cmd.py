@@ -49,10 +49,9 @@ class TracCmd(cmd.Cmd):
         return (ticket_number, attributes, )
 
     def do_ticket_create(self, line):
+        attributes = {}
         if line:
-            attributes = json.loads(line)
-        else:
-            attributes = {}
+            attributes.update(json.loads(line))
 
         ticket_number = self.tph.ticket_create(attributes, True)
         if ticket_number is not None:
