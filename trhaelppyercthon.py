@@ -163,6 +163,30 @@ class TPH(object):
                                       attributes
                                   )
 
+    def ticket_sibling_create(self, ticket_number, attributes, use_editor=False, reporter=""):
+        # get the ticket to clone
+        ticket = self.ticket_get(ticket_number)
+        ticket_old_attributes = ticket[3]
+        # get only the relevant info to copy from the sibling ticket
+        ticket_attributes = {
+            "cc" : ticket_old_attributes["cc"],
+            "component" : ticket_old_attributes["component"],
+            "estimatedhours" : ticket_old_attributes["estimatedhours"],
+            "keywords" : ticket_old_attributes["keywords"],
+            "milestone" : ticket_old_attributes["milestone"],
+            "owner" : ticket_old_attributes["owner"],
+            "parents" : ticket_old_attributes["parents"],
+            "priority" : ticket_old_attributes["priority"],
+            "reporter" : reporter,
+            "summary" : ticket_old_attributes["summary"] + " - Sibling",
+            "status" : "new",
+            "description" : ticket_old_attributes["description"],
+            'type': ticket_old_attributes["type"],
+        }
+        # update the attributes with the ones provided in argument
+        ticket_attributes.update(attributes)
+        return self.ticket_create(ticket_attributes, use_editor)
+
     def ticket_get(self, ticket):
         return self.server.ticket.get(ticket)
 

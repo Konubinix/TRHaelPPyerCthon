@@ -81,8 +81,23 @@ class TracCmd(cmd.Cmd):
         else:
             print "Creation aborted"
 
-    def do_query_ticket(self, line):
+    def do_ticket_sibling_create(self, line):
+        (ticket_number, attributes,) = self.ticket_attributes_parse_line(line)
+        new_ticket_number = self.tph.ticket_sibling_create(
+            ticket_number,
+            attributes,
+            True,
+            reporter=self.me
+        )
+        if new_ticket_number:
+            print "Ticket %s, sibling of %s, created" % (new_ticket_number,
+                                                         ticket_number)
+        else:
+            print "Creation aborted"
+
+    def do_ticket_query(self, line):
         """owner=owner&status=accepted"""
+        assert line, "argument cannot be empty"
         print self.tph.server.ticket.query(line)
 
     def do_ticket_sons(self, ticket_number):
@@ -113,10 +128,10 @@ class TracCmd(cmd.Cmd):
         print self.me
 
     def do_ticket_mine(self, line):
-        self.do_query_ticket("owner=%s&status=accepted" % self.me)
+        self.do_ticket_query("owner=%s&status=accepted" % self.me)
 
     def do_ticket_mine_pending(self, line):
-        self.do_query_ticket("owner=%s&status=assigned" % self.me)
+        self.do_ticket_query("owner=%s&status=assigned" % self.me)
 
     def do_ticket_close(self, ticket):
         if self.tph.ticket_close(int(ticket)):
