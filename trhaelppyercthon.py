@@ -47,14 +47,13 @@ class TPH(object):
 
     def edit(self, content, suffix=".wiki", prefix=""):
         temp_file = tempfile.NamedTemporaryFile(prefix=prefix, suffix=suffix, delete=False)
-        temp_file.write(content)
+        temp_file.write(content.encode("utf-8"))
         temp_file.close()
         rc = subprocess.call([os.environ["EDITOR"], temp_file.name])
         if rc == 0:
             # get the new content and return it
             with open(temp_file.name, "r") as tfile:
-                new_content = tfile.read()
-
+                new_content = tfile.read().decode("utf-8")
         else:
             new_content = None
             os.unlink(temp_file.name)
