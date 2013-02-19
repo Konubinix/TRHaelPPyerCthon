@@ -101,7 +101,8 @@ class TracCmd(cmd.Cmd):
         print self.tph.server.ticket.query(line)
 
     def do_ticket_sons(self, ticket_number):
-        print self.tph.server.ticket.query("parents=~%s" % (ticket_number))
+        assert ticket_number, "argument cannot be empty"
+        print self.tph.ticket_sons(ticket_number)
 
     def do_ticket_accept(self, ticket_number):
         assert ticket_number, "argument cannot be empty"
