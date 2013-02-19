@@ -103,6 +103,21 @@ class TracCmd(cmd.Cmd):
     def do_ticket_sons(self, ticket_number):
         print self.tph.server.ticket.query("parents=~%s" % (ticket_number))
 
+    def do_ticket_accept(self, ticket_number):
+        assert ticket_number, "argument cannot be empty"
+        if self.tph.ticket_accept(int(ticket_number), self.me):
+            print "Ticket %s accepted" % ticket_number
+        else:
+            print "Abort the acceptation of the ticket %s" % ticket_number
+
+    def do_ticket_remaining_time(self, ticket_number):
+        assert ticket_number, "argument cannot be empty"
+        print self.tph.ticket_remaining_time(ticket_number)
+
+    def do_ticket_remaining_time_sum(self, ticket_number):
+        assert ticket_number, "argument cannot be empty"
+        print self.tph.ticket_remaining_time_sum(ticket_number)
+
     def do_template_edit(self, line):
         if self.tph.template_edit():
             print "Edited template"
@@ -228,9 +243,20 @@ class TracCmd(cmd.Cmd):
             stderr=subprocess.PIPE
         )
 
+    def do_milestone_edit(self, milestone_name):
+        if self.tph.milestone_edit(milestone_name):
+            print "Milestone %s edited" % milestone_name
+        else:
+            print "Edition aborted of milestone %s" % milestone_name
+
+    def do_milestone_list(self, list):
+        self.pp.pprint(sorted(self.tph.milestone_list()))
 
     def do_EOF(self, line):
         return True
+
+TracCmd.do_list_milestones = TracCmd.do_milestone_list
+TracCmd.do_list_methods = TracCmd.do_method_list
 
 def main():
     config = ConfigParser.ConfigParser()

@@ -190,6 +190,77 @@ class TPH(object):
     def ticket_get(self, ticket):
         return self.server.ticket.get(ticket)
 
+    def ticket_close(self, ticket):
+        content = self.tph.edit("fixed\n\nComment")
+        if content == "":
+            return False
+        content_split = content.splitlines()
+        resolution = content_split[0]
+        comment = "\n".join(content_split[2:])
+        self.server.ticket.update(ticket,
+                                  comment,
+                                  {
+                                      'action':'resolve',
+                                      'action_resolve_resolve_resolution': resolution,
+                                  }
+                              )
+        return True
+
+    def ticket_edit(self, ticket_number):
+        ticket = self.ticket_get(ticket_number)
+        attributes = ticket[3]
+        attributes = self.attributes_edit(attributes, str(ticket_number))
+        if attributes:
+            attributes_string = self.attributes_dump(attributes)
+            comment = self.edit_comment(info=attributes_string, prefix=str(ticket_number))
+            if comment is None:
+                return False
+            self.server.ticket.update(
+                ticket[0],
+                comment,
+                attributes
+            )
+            return True
+        else:
+            return False
+
+    def ticket_accept(self, ticket_number, owner):
+        ticket = self.ticket_get(ticket_number)
+        attributes = ticket[3]
+        attributes["status"] = "accepted"
+        attributes["owner"] = owner
+        attributes = self.attributes_edit(attributes, str(ticket_number))
+        if attributes:
+            attributes_string = self.attributes_dump(attributes)
+            comment = self.edit_comment(
+                comment="Accepted ticket",
+                info=attributes_string,
+                prefix="accept_"+str(ticket_number))
+            if comment is None:
+                return False
+            self.server.ticket.update(
+                ticket[0],
+                comment,
+                attributes
+            )
+            return True
+        else:
+            return False
+
+    def ticket_sons(self, ticket_number):
+        return self.server.ticket.query("parents=~%s" % (ticket_number))
+
+    def ticket_remaining_time(self, ticket_number):
+        ticket = self.ticket_get(ticket_number)
+        attributes = ticket[3]
+        return int(attributes["estimatedhours"])
+
+    def ticket_remaining_time_sum(self, ticket_number):
+        time = self.ticket_remaining_time(ticket_number)
+        for child in self.ticket_sons(ticket_number):
+            time += self.ticket_remaining_time_sum(child)
+        return time
+
     def ticket_batch_edit(self, id_list):
         for id in id_list:
             ticket = self.ticket_get(id)
@@ -222,40 +293,26 @@ class TPH(object):
 
         return True
 
-    def ticket_close(self, ticket):
-        content = self.tph.edit("fixed\n\nComment")
-        if content == "":
-            return False
-        content_split = content.splitlines()
-        resolution = content_split[0]
-        comment = "\n".join(content_split[2:])
-        self.server.ticket.update(ticket,
-                                  comment,
-                                  {
-                                      'action':'resolve',
-                                      'action_resolve_resolve_resolution': resolution,
-                                  }
-                              )
-        return True
-
-    def ticket_edit(self, ticket_number):
-        ticket = self.ticket_get(ticket_number)
-        attributes = ticket[3]
-        attributes = self.attributes_edit(attributes, str(ticket_number))
-        if attributes:
-            attributes_string = self.attributes_dump(attributes)
-            comment = self.edit_comment(info=attributes_string)
-            self.server.ticket.update(
-                ticket[0],
-                comment,
-                attributes
-            )
-            return True
-        else:
-            return False
-
     def list_components(self, filter):
         return [
             comp for comp in self.server.ticket.component.getAll()
             if re.search(filter, comp, flags=re.I)
         ]
+
+    def milestone_edit(self, milestone_name):
+        milestone = self.server.ticket.milestone.get(milestone_name)
+        desc = milestone["description"]
+        new_desc = self.edit(desc, prefix=milestone_name.replace(" ", "_"))
+        if new_desc:
+            self.server.ticket.milestone.update(
+                milestone_name,
+                {
+                    "description":new_desc,
+                },
+            )
+            return True
+
+        return False
+
+    def milestone_list(self):
+        return self.server.ticket.milestone.getAll()
