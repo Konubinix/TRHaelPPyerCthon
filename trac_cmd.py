@@ -125,14 +125,22 @@ class TracCmd(cmd.Cmd):
             print "Edition aborted"
 
     def do_template_save(self, filename):
+        if not filename:
+            assert self.template_file,\
+                "You should provide the template file or set TRAC_CMD_TEMPLATE_FILE"
+            filename = self.template_file
         if self.tph.template_save(filename):
-            print "Template file saved"
+            print "Template file saved in %s" (filename,)
         else:
             print "Template file not saved"
 
     def do_template_open(self, filename):
+        if not filename:
+            assert self.template_file,\
+                "You should provide the template file or set TRAC_CMD_TEMPLATE_FILE"
+            filename = self.template_file
         if self.tph.template_open(filename):
-            print "Template file loaded"
+            print "Template file %s loaded" % (filename,)
         else:
             print "Template file not loaded"
 
