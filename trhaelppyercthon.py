@@ -30,12 +30,12 @@ class TPH(object):
         )
         self.template_attributes = {}
 
-    def edit_comment(self, comment="", info=""):
+    def edit_comment(self, comment="", info="", prefix=""):
         info_string = "\n".join([
             "# " + line for line in info.splitlines()
         ])
         info_string = "\n# lines beginning with # are avoided\n" + info_string
-        comment = self.edit(comment + info_string)
+        comment = self.edit(comment + info_string, prefix=prefix)
         # remove the lines beginning with #
         new_comment_lines = [
             line for line in comment.splitlines()
