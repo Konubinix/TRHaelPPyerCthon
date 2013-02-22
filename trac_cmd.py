@@ -49,7 +49,11 @@ class TracCmd(cmd.Cmd):
         return (ticket_number, attributes, )
 
     def do_ticket_create(self, line):
-        attributes = {}
+        attributes = {
+            "type":"Defect",
+            "reporter":self.me,
+            "status":"new",
+        }
         if line:
             attributes.update(json.loads(line))
 
