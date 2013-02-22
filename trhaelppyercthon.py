@@ -4,6 +4,7 @@
 import netrc
 import tempfile
 import subprocess
+import datetime
 import os
 import re
 
@@ -269,6 +270,18 @@ class TPH(object):
                                       "",
                                       attributes
                                   )
+
+
+    def ticket_changelog(self, ticket, filter=lambda x:True):
+        cl = self.server.ticket.changeLog(ticket)
+        return [l for l in cl if filter(l)]
+
+    def ticket_recent_changes(self, since, filter=lambda x:True):
+        tickets = self.server.ticket.getRecentChanges(since)
+        new_filter = lambda log:filter(log) and since <= log[0]
+        changelogs = {ticket : self.ticket_changelog(ticket, new_filter)
+                      for ticket in tickets}
+        return changelogs
 
     def template_edit(self):
         attributes = \

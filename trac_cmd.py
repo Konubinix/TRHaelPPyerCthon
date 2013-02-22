@@ -12,6 +12,7 @@ import pprint
 import string
 import json
 import re
+from datetime import datetime
 from trhaelppyercthon import TPH
 
 class TracCmd(cmd.Cmd):
@@ -268,8 +269,38 @@ class TracCmd(cmd.Cmd):
     def do_EOF(self, line):
         return True
 
+    def do_ticket_recent_changes(self, date_time):
+        date = self._parse_date(date_time)
+        self.pp.pprint(self.tph.ticket_recent_changes(date))
+
+    def _parse_date(self, date_time):
+        if re.search(date_time, "today"):
+            time = datetime.today().replace(
+                hour = 0,
+                minute = 0,
+                second = 0
+            )
+        elif re.search(date_time, "yesterday"):
+            time = datetime.today()
+            time = time.replace(
+                day = time.day - 1,
+                hour = 0,
+                minute = 0,
+                second = 0
+            )
+        elif date_time.__class__ == str:
+            time = datetime.strptime(
+                date_time,
+                "%d %m %y %H %M %S"
+            )
+        else:
+            assert False, "Cannot parse %s for a date" % date_time
+
+        return time
+
 TracCmd.do_list_milestones = TracCmd.do_milestone_list
 TracCmd.do_list_methods = TracCmd.do_method_list
+TracCmd.do_help_method = TracCmd.do_method_help
 
 def main():
     config = ConfigParser.ConfigParser()
