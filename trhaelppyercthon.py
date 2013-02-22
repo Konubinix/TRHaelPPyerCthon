@@ -56,8 +56,8 @@ class TPH(object):
                 new_content = tfile.read().decode("utf-8")
         else:
             new_content = None
-            os.unlink(temp_file.name)
 
+        os.unlink(temp_file.name)
         return new_content
 
     def attributes_dump(self, attributes, ignore_empty=False):
