@@ -191,7 +191,7 @@ class TPH(object):
         return self.server.ticket.get(ticket)
 
     def ticket_close(self, ticket):
-        content = self.tph.edit("fixed\n\nComment")
+        content = self.edit("fixed\n\nComment")
         if content == "":
             return False
         content_split = content.splitlines()
