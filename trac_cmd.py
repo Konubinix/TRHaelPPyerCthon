@@ -12,11 +12,12 @@ import string
 import json
 import trac_connection
 import re
+import pickle
 from datetime import datetime
 from trhaelppyercthon import TPH
 
 class TracCmd(cmd.Cmd):
-    def __init__(self, server, login="", url="", template_file=""):
+    def __init__(self, server, login="", url="", template_file="", report_last_time_file=""):
         cmd.Cmd.__init__(self)
         self.tph = TPH(server)
         self.me = login
@@ -29,6 +30,12 @@ class TracCmd(cmd.Cmd):
            and \
            os.path.exists(self.template_file):
             self.tph.template_open(self.template_file)
+
+        if report_last_time_file:
+            self.report_last_time_file = \
+                os.path.expanduser(report_last_time_file)
+
+        self.last_report_date = None
 
     def do_method_list(self, line):
         for method in self.tph.server.system.listMethods():
@@ -270,8 +277,71 @@ class TracCmd(cmd.Cmd):
         return True
 
     def do_ticket_recent_changes(self, date_time):
-        date = self._parse_date(date_time)
-        self.pp.pprint(self.tph.ticket_recent_changes(date))
+        if date_time:
+            date = self._parse_date(date_time)
+        elif self.report_last_time_file \
+           and os.path.exists(self.report_last_time_file):
+            with open(self.report_last_time_file, "r") as fi:
+                date = pickle.load(fi)
+        elif self.last_report_date:
+            date = self.last_report_date
+        else:
+            date = datetime(month=1, year=1970, day=1)
+        self.last_report_date = date
+        print("Report for date %s" % date)
+        changes = self.tph.ticket_recent_changes(
+            date,
+            filter=lambda log:not (
+                log[3] == "comment" \
+                and log[5] == ""
+            )
+        )
+        for change in sorted(changes, key=lambda change:change[1]):
+            #self.pp.pprint(change)
+            self._dump_change(change)
+
+    def _dump_change(self, change):
+        print "  At %s" % change[1]
+        print "%s" % change[2],
+        print "Ticket : %s" % change[0],
+        if change[3] == "comment":
+            print "Added comment : %s" % change[5]
+        elif change[3] == "description":
+            print "changed the description of the ticket"
+        elif change[3] == "status":
+            print "changed the status from %s to %s" % (change[4], change[5],)
+        elif change[3] == "estimatedhours":
+            print "updated estimated hours (%s -> %s)" % (change[4], change[5],)
+        elif change[3] == "resolution":
+            print "closed the ticket with reason %s" % (change[5],)
+        elif change[3] == "owner":
+            print "changed owner form %s to %s" % (change[4], change[5],)
+        elif change[3] == "keywords":
+            print "changed keywords form %s to %s" % (change[4], change[5],)
+        elif change[3] == "milestone":
+            print "changed milestone form %s to %s" % (change[4], change[5],)
+        elif change[3] == "parents":
+            print "changed parents form %s to %s" % (change[4], change[5],)
+        elif change[3] == "priority":
+            print "changed priority form %s to %s" % (change[4], change[5],)
+        else:
+            self.pp.pprint(change)
+
+    def do_ticket_recent_changes_save_date(self, date_time):
+        """record the last report date.
+        If a date is given as argument, use that date.
+        Default to the last report date"""
+        assert self.report_last_time_file,\
+            "You must indicate a file in the config file"
+        if date_time:
+            date = self._parse_date(date_time)
+        else:
+            assert self.last_report_date,\
+                "You must give a date or run ticket_recent_changes"
+            date = self.last_report_date
+        with open(self.report_last_time_file, "w") as fi:
+            pickle.dump(date, fi)
+        print "Recorded the last time of the report at %s" % date
 
     def _parse_date(self, date_time):
         if re.search(date_time, "today"):
@@ -280,6 +350,8 @@ class TracCmd(cmd.Cmd):
                 minute = 0,
                 second = 0
             )
+        elif re.search(date_time, "now"):
+            time = datetime.now()
         elif re.search(date_time, "yesterday"):
             time = datetime.today()
             time = time.replace(
@@ -310,6 +382,7 @@ def main():
     url = config.get("server", "url")
     protocol = config.get("server", "protocol")
     trac_path = config.get("server", "trac_path")
+    last_time_file = config.get("report", "last_time_file")
     (login, server) = trac_connection.from_netrc(url, protocol, trac_path)
     TracCmd(server,
             login=login,
@@ -317,7 +390,8 @@ def main():
                 "PROTOCOL" : protocol,
                 "URL" : url,
                 "PATH" : trac_path,
-            }
+            },
+            report_last_time_file=last_time_file
         ).cmdloop()
 
 if __name__ == '__main__':

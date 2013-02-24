@@ -274,16 +274,16 @@ class TPH(object):
                                       attributes
                                   )
 
-
     def ticket_changelog(self, ticket, filter=lambda x:True):
         cl = self.server.ticket.changeLog(ticket)
-        return [l for l in cl if filter(l)]
+        return [[ticket] + l for l in cl if filter([ticket] + l)]
 
     def ticket_recent_changes(self, since, filter=lambda x:True):
         tickets = self.server.ticket.getRecentChanges(since)
-        new_filter = lambda log:filter(log) and since <= log[0]
-        changelogs = {ticket : self.ticket_changelog(ticket, new_filter)
-                      for ticket in tickets}
+        new_filter = lambda log:filter(log) and since <= log[1]
+        changelogs = []
+        for ticket in tickets:
+            changelogs = changelogs + self.ticket_changelog(ticket, new_filter)
         return changelogs
 
     def template_edit(self):
