@@ -2,7 +2,6 @@
 # -*- coding:utf-8 -*-
 
 import xmlrpclib
-import netrc                    # to access to credentials
 import ConfigParser
 import cmd
 import subprocess
@@ -11,6 +10,7 @@ import os
 import pprint
 import string
 import json
+import trac_connection
 import re
 from datetime import datetime
 from trhaelppyercthon import TPH
@@ -310,21 +310,7 @@ def main():
     url = config.get("server", "url")
     protocol = config.get("server", "protocol")
     trac_path = config.get("server", "trac_path")
-    net = netrc.netrc()
-    (login, account, password) = \
-                                 net.authenticators(
-                                     "%s://%s" % (protocol, url,)
-                                 )
-    server = \
-             xmlrpclib.ServerProxy(
-                 "%(PROTOCOL)s://%(LOGIN)s:%(PASS)s@%(URL)s%(PATH)s/login/xmlrpc"
-                 % {"LOGIN" : login,
-                    "PASS" : password,
-                    "PROTOCOL" : protocol,
-                    "PATH" : trac_path,
-                    "URL" : url,
-                }
-             )
+    (login, server) = trac_connection.from_netrc(url, protocol, trac_path)
     TracCmd(server,
             login=login,
             url="%(PROTOCOL)s://%(URL)s%(PATH)s" % {
