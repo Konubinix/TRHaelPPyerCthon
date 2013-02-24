@@ -100,7 +100,10 @@ class TPH(object):
         if attributes_string == "":
             return None
 
-        return self.attributes_load(attributes_string)
+        new_attributes = self.attributes_load(attributes_string)
+        if attributes.get("_ts", None):
+            new_attributes["_ts"] = attributes["_ts"]
+        return new_attributes
 
     def ticket_create(self, p_attributes, use_editor=False):
         attributes = self.template_attributes.copy()
