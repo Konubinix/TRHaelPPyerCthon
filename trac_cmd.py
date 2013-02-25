@@ -233,7 +233,9 @@ class TracCmd(cmd.Cmd):
         changelog.reverse()
         if lines != "0":
             changelog = changelog[:int(lines)]
-        self.pp.pprint(changelog)
+        changelog.reverse()
+        for change in changelog:
+            self._dump_change(change)
 
     def do_web(self, ticket):
         url="%(URL)s/ticket/%(TICKET)s" % {
