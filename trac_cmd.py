@@ -172,6 +172,7 @@ class TracCmd(cmd.Cmd):
 
     def do_ticket_mine_pending(self, line):
         self.do_ticket_query("owner=%s&status=assigned" % self.me)
+        self.do_ticket_query("owner=%s&status=new" % self.me)
 
     def do_ticket_close(self, ticket):
         if self.tph.ticket_close(int(ticket)):
