@@ -223,7 +223,13 @@ class TracCmd(cmd.Cmd):
         match = re.match(" *([0-9]+)( +([0-9]+))?", line)
         ticket_number = match.group(1)
         lines = match.group(3) or "10"
-        changelog = self.tph.server.ticket.changeLog(ticket_number)
+        changelog = self.tph.ticket_changelog(
+            ticket_number,
+            filter=lambda log:not (
+                log[3] == "comment" \
+                and log[5] == ""
+            )
+        )
         changelog.reverse()
         if lines != "0":
             changelog = changelog[:int(lines)]
