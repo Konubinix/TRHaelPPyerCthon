@@ -254,6 +254,9 @@ class TPH(object):
     def ticket_sons(self, ticket_number):
         return self.server.ticket.query("parents=~%s" % (ticket_number))
 
+    def ticket_parents(self, ticket_number):
+        return self.ticket_get(ticket_number)[3]["parents"]
+
     def ticket_remaining_time(self, ticket_number):
         ticket = self.ticket_get(ticket_number)
         attributes = ticket[3]

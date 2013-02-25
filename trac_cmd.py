@@ -116,6 +116,10 @@ class TracCmd(cmd.Cmd):
         assert ticket_number, "argument cannot be empty"
         print self.tph.ticket_sons(ticket_number)
 
+    def do_ticket_parents(self, ticket_number):
+        assert ticket_number, "argument cannot be empty"
+        print self.tph.ticket_parents(int(ticket_number))
+
     def do_ticket_accept(self, ticket_number):
         assert ticket_number, "argument cannot be empty"
         if self.tph.ticket_accept(int(ticket_number), self.me):
