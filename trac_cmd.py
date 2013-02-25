@@ -321,7 +321,16 @@ class TracCmd(cmd.Cmd):
             self._dump_change(change)
 
     def _dump_change(self, change):
-        print "  At %s" % change[1]
+        date_tuble = change[1].timetuple()
+        date = datetime(
+            date_tuble.tm_year,
+            date_tuble.tm_mon,
+            date_tuble.tm_mday,
+            date_tuble.tm_hour,
+            date_tuble.tm_min,
+            date_tuble.tm_sec
+        )
+        print "  At %s" % (date.strftime("%d/%m/%y %H:%M:%S"),)
         print "%s" % change[2],
         print "Ticket : %s" % change[0],
         if change[3] == "comment":
@@ -383,7 +392,7 @@ class TracCmd(cmd.Cmd):
         elif date_time.__class__ == str:
             time = datetime.strptime(
                 date_time,
-                "%d %m %y %H %M %S"
+                "%d/%m/%y %H:%M:%S"
             )
         else:
             assert False, "Cannot parse %s for a date" % date_time
