@@ -292,7 +292,7 @@ class TracCmd(cmd.Cmd):
     def do_EOF(self, line):
         return True
 
-    def do_ticket_recent_changes(self, date_time):
+    def _parse_date_recent_changes(self, date_time):
         if date_time:
             date = self._parse_date(date_time)
         elif self.report_last_time_file \
@@ -304,6 +304,10 @@ class TracCmd(cmd.Cmd):
         else:
             date = datetime(month=1, year=1970, day=1)
         self.last_report_date = date
+        return date
+
+    def do_ticket_recent_changes(self, date_time):
+        date = self._parse_date_recent_changes(date_time)
         print("Report for date %s" % date)
         changes = self.tph.ticket_recent_changes(
             date,
