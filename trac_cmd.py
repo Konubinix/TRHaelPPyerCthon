@@ -168,10 +168,13 @@ class TracCmd(cmd.Cmd):
         print self.me
 
     def do_ticket_mine(self, line):
+        print "Accepted tickets"
         self.do_ticket_query("owner=%s&status=accepted" % self.me)
 
     def do_ticket_mine_pending(self, line):
+        print "Assigned tickets"
         self.do_ticket_query("owner=%s&status=assigned" % self.me)
+        print "New tickets"
         self.do_ticket_query("owner=%s&status=new" % self.me)
 
     def do_ticket_close(self, ticket):
