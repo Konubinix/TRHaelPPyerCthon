@@ -312,7 +312,7 @@ class TPH(object):
     def list_components(self, filter):
         return [
             comp for comp in self.server.ticket.component.getAll()
-            if re.search(filter, comp, flags=re.I)
+            if filter(comp)
         ]
 
     def milestone_edit(self, milestone_name):
