@@ -35,7 +35,7 @@ class TracCmd(cmd.Cmd):
             self.report_last_time_file = \
                 os.path.expanduser(report_last_time_file)
 
-        self.last_report_date = None
+        self.last_recent_change_date = None
 
     def do_method_list(self, line):
         for method in self.tph.server.system.listMethods():
@@ -302,11 +302,10 @@ class TracCmd(cmd.Cmd):
            and os.path.exists(self.report_last_time_file):
             with open(self.report_last_time_file, "r") as fi:
                 date = pickle.load(fi)
-        elif self.last_report_date:
-            date = self.last_report_date
+        elif self.last_recent_change_date:
+            date = self.last_recent_change_date
         else:
             date = datetime(month=1, year=1970, day=1)
-        self.last_report_date = date
         return date
 
     def do_ticket_recent_changes(self, date_time):
@@ -319,9 +318,13 @@ class TracCmd(cmd.Cmd):
                 and log[5] == ""
             )
         )
+        # recent changes do not show created tickets get the created tickets
+        # from that time
+        self.last_recent_change_date = datetime.utcnow()
         for change in sorted(changes, key=lambda change:change[1]):
             #self.pp.pprint(change)
             self._dump_change(change)
+
 
     def _dump_change(self, change):
         date_tuble = change[1].timetuple()
@@ -368,12 +371,12 @@ class TracCmd(cmd.Cmd):
         if date_time:
             date = self._parse_date(date_time)
         else:
-            assert self.last_report_date,\
+            assert self.last_recent_change_date,\
                 "You must give a date or run ticket_recent_changes"
-            date = self.last_report_date
+            date = self.last_recent_change_date
         with open(self.report_last_time_file, "w") as fi:
             pickle.dump(date, fi)
-        print "Recorded the last time of the report at %s" % date
+        print "Recorded the last time of the report at %s" % date.strftime("%d/%m/%y %H:%M:%S")
 
     def _parse_date(self, date_time):
         if re.search(date_time, "today"):
@@ -383,7 +386,7 @@ class TracCmd(cmd.Cmd):
                 second = 0
             )
         elif re.search(date_time, "now"):
-            time = datetime.now()
+            time = datetime.utcnow()
         elif re.search(date_time, "yesterday"):
             time = datetime.today()
             time = time.replace(
