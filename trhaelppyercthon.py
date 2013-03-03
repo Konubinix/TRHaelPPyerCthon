@@ -283,11 +283,26 @@ class TPH(object):
 
     def ticket_recent_changes(self, since, filter=lambda x:True):
         tickets = self.server.ticket.getRecentChanges(since)
+        created_tickets = self.server.ticket.query(
+            "created=%s.." % (since.strftime("%m/%d/%y"))
+        )
         new_filter = lambda log:filter(log) and since <= log[1]
+        # from the created tickets. Retrieve only those that have been created
+        # after since
+        created_tickets_changelogs = []
+        for ticket_number in created_tickets:
+            ticket = self.ticket_get(ticket_number)
+            ticket_log = [ticket_number, ticket[1], ticket[3]["reporter"], "created", "", "", ""]
+            if new_filter(ticket_log):
+                created_tickets_changelogs.append(
+                    ticket_log
+                )
+
+
         changelogs = []
         for ticket in tickets:
             changelogs = changelogs + self.ticket_changelog(ticket, new_filter)
-        return changelogs
+        return created_tickets_changelogs + changelogs
 
     def template_edit(self):
         attributes = \
