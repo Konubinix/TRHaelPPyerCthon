@@ -37,25 +37,6 @@ class TracCmd(cmd.Cmd):
 
         self.last_recent_change_date = None
 
-    def do_method_list(self, line):
-        for method in self.tph.server.system.listMethods():
-            print method
-
-    def do_method_help(self, method):
-        print self.tph.server.system.methodHelp(method)
-
-    def ticket_attributes_parse_line(self, line):
-        '''Ex: 72 {"summary":"New ticket"}'''
-        content_match = re.match(" *([0-9]+)( +(.+))?", line)
-        ticket_number = content_match.group(1)
-        attributes = content_match.group(3)
-        if attributes:
-            attributes = json.loads(attributes)
-        else:
-            attributes = {}
-
-        return (ticket_number, attributes, )
-
     def do_ticket_create(self, line):
         attributes = {
             "type":"Defect",
@@ -72,7 +53,7 @@ class TracCmd(cmd.Cmd):
             print "Creation aborted"
 
     def do_ticket_clone(self, line):
-        (ticket_number, attributes, ) = self.ticket_attributes_parse_line(line)
+        (ticket_number, attributes, ) = self._ticket_attributes_parse_line(line)
         new_ticket_number = self.tph.ticket_clone(ticket_number, attributes,
                                                   True, reporter=self.me)
         if new_ticket_number:
@@ -82,7 +63,7 @@ class TracCmd(cmd.Cmd):
             print "Clone ticket not created"
 
     def do_ticket_son_create(self, line):
-        (ticket_number, attributes,) = self.ticket_attributes_parse_line(line)
+        (ticket_number, attributes,) = self._ticket_attributes_parse_line(line)
         new_ticket_number = self.tph.ticket_son_create(ticket_number,
                                                        attributes,
                                                        True,
@@ -94,7 +75,7 @@ class TracCmd(cmd.Cmd):
             print "Creation aborted"
 
     def do_ticket_sibling_create(self, line):
-        (ticket_number, attributes,) = self.ticket_attributes_parse_line(line)
+        (ticket_number, attributes,) = self._ticket_attributes_parse_line(line)
         new_ticket_number = self.tph.ticket_sibling_create(
             ticket_number,
             attributes,
@@ -135,37 +116,38 @@ class TracCmd(cmd.Cmd):
         assert ticket_number, "argument cannot be empty"
         print self.tph.ticket_remaining_time_sum(ticket_number)
 
-    def do_template_edit(self, line):
-        if self.tph.template_edit():
-            print "Edited template"
+    def do_ticket_recent_changes(self, date_time):
+        date = self._parse_date_recent_changes(date_time)
+        print("Report for date %s" % date)
+        changes = self.tph.ticket_recent_changes(
+            date,
+            filter=lambda log:not (
+                log[3] == "comment" \
+                and log[5] == ""
+            )
+        )
+        # recent changes do not show created tickets get the created tickets
+        # from that time
+        self.last_recent_change_date = datetime.utcnow()
+        for change in sorted(changes, key=lambda change:change[1]):
+            #self.pp.pprint(change)
+            self._dump_change(change)
+
+    def do_ticket_recent_changes_save_date(self, date_time):
+        """record the last report date.
+        If a date is given as argument, use that date.
+        Default to the last report date"""
+        assert self.report_last_time_file,\
+            "You must indicate a file in the config file"
+        if date_time:
+            date = self._parse_date(date_time)
         else:
-            print "Edition aborted"
-
-    def do_template_save(self, filename):
-        if not filename:
-            assert self.template_file,\
-                "You should provide the template file or set TRAC_CMD_TEMPLATE_FILE"
-            filename = self.template_file
-        if self.tph.template_save(filename):
-            print "Template file saved in %s" (filename,)
-        else:
-            print "Template file not saved"
-
-    def do_template_open(self, filename):
-        if not filename:
-            assert self.template_file,\
-                "You should provide the template file or set TRAC_CMD_TEMPLATE_FILE"
-            filename = self.template_file
-        if self.tph.template_open(filename):
-            print "Template file %s loaded" % (filename,)
-        else:
-            print "Template file not loaded"
-
-    def do_iam(self, line):
-        self.me = line
-
-    def do_whoami(self, line):
-        print self.me
+            assert self.last_recent_change_date,\
+                "You must give a date or run ticket_recent_changes"
+            date = self.last_recent_change_date
+        with open(self.report_last_time_file, "w") as fi:
+            pickle.dump(date, fi)
+        print "Recorded the last time of the report at %s" % date.strftime("%d/%m/%y %H:%M:%S")
 
     def do_ticket_mine(self, line):
         print "Accepted tickets"
@@ -186,31 +168,13 @@ class TracCmd(cmd.Cmd):
     def do_ticket_summary(self, ticket):
         print self.tph.ticket_get(int(ticket))[3]["summary"]
 
-    def do_list_attachment(self, ticket):
-        print self.tph.server.ticket.listAttachments(int(ticket))
-
-    def do_list_components(self, filter):
+    def do_ticket_search(self, query):
         self.pp.pprint(
-            self.tph.list_components(filter)
+            self.tph.server.search.performSearch(
+                query,
+                ["ticket",]
+            )
         )
-
-    def do_list_resolution(self, line):
-        self.pp.pprint(self.tph.server.ticket.resolution.getAll())
-
-    def do_list_priority(self, line):
-        self.pp.pprint(self.tph.server.ticket.priority.getAll())
-
-    def do_list_status(self, line):
-        self.pp.pprint(self.tph.server.ticket.status.getAll())
-
-    def do_list_type(self, line):
-        self.pp.pprint(self.tph.server.ticket.type.getAll())
-
-    def do_get_actions(self, ticket):
-        print self.tph.server.ticket.getActions(int(ticket))
-
-    def do_verbatim(self, line):
-        exec("self.pp.pprint(self.tph.server.%s" % line + ")")
 
     def do_ticket_edit(self, ticket_number):
         if self.tph.ticket_edit(int(ticket_number)):
@@ -240,6 +204,88 @@ class TracCmd(cmd.Cmd):
         for change in changelog:
             self._dump_change(change)
 
+    def do_template_edit(self, line):
+        if self.tph.template_edit():
+            print "Edited template"
+        else:
+            print "Edition aborted"
+
+    def do_template_save(self, filename):
+        if not filename:
+            assert self.template_file,\
+                "You should provide the template file or set TRAC_CMD_TEMPLATE_FILE"
+            filename = self.template_file
+        if self.tph.template_save(filename):
+            print "Template file saved in %s" (filename,)
+        else:
+            print "Template file not saved"
+
+    def do_template_open(self, filename):
+        if not filename:
+            assert self.template_file,\
+                "You should provide the template file or set TRAC_CMD_TEMPLATE_FILE"
+            filename = self.template_file
+        if self.tph.template_open(filename):
+            print "Template file %s loaded" % (filename,)
+        else:
+            print "Template file not loaded"
+
+    def do_milestone_edit(self, milestone_name):
+        if self.tph.milestone_edit(milestone_name):
+            print "Milestone %s edited" % milestone_name
+        else:
+            print "Edition aborted of milestone %s" % milestone_name
+
+    def do_milestone_list(self, list):
+        self.pp.pprint(sorted(self.tph.milestone_list()))
+
+    def do_wiki_search(self, query):
+        self.pp.pprint(
+            self.tph.server.search.performSearch(
+                query,
+                ["wiki",]
+            )
+        )
+
+    def do_list_attachment(self, ticket):
+        print self.tph.server.ticket.listAttachments(int(ticket))
+
+    def do_list_components(self, filter):
+        self.pp.pprint(
+            self.tph.list_components(filter)
+        )
+
+    def do_list_resolution(self, line):
+        self.pp.pprint(self.tph.server.ticket.resolution.getAll())
+
+    def do_list_priority(self, line):
+        self.pp.pprint(self.tph.server.ticket.priority.getAll())
+
+    def do_list_status(self, line):
+        self.pp.pprint(self.tph.server.ticket.status.getAll())
+
+    def do_list_type(self, line):
+        self.pp.pprint(self.tph.server.ticket.type.getAll())
+
+    def do_method_list(self, line):
+        for method in self.tph.server.system.listMethods():
+            print method
+
+    def do_method_help(self, method):
+        print self.tph.server.system.methodHelp(method)
+
+    def do_get_actions(self, ticket):
+        print self.tph.server.ticket.getActions(int(ticket))
+
+    def do_verbatim(self, line):
+        exec("self.pp.pprint(self.tph.server.%s" % line + ")")
+
+    def do_iam(self, line):
+        self.me = line
+
+    def do_whoami(self, line):
+        print self.me
+
     def do_web(self, ticket):
         url="%(URL)s/ticket/%(TICKET)s" % {
             "URL" : self.url,
@@ -253,27 +299,8 @@ class TracCmd(cmd.Cmd):
             stderr=subprocess.PIPE
         )
 
-    def do_change_parents(self, ticket):
-        self.change_part(ticket, 'parents')
-
     def do__dump_ticket(self, ticket):
         self.pp.pprint(self.tph.ticket_get(int(ticket)))
-
-    def do_ticket_search(self, query):
-        self.pp.pprint(
-            self.tph.server.search.performSearch(
-                query,
-                ["ticket",]
-            )
-        )
-
-    def do_wiki_search(self, query):
-        self.pp.pprint(
-            self.tph.server.search.performSearch(
-                query,
-                ["wiki",]
-            )
-        )
 
     def do__api(self, ticket):
         subprocess.Popen(
@@ -283,17 +310,17 @@ class TracCmd(cmd.Cmd):
             stderr=subprocess.PIPE
         )
 
-    def do_milestone_edit(self, milestone_name):
-        if self.tph.milestone_edit(milestone_name):
-            print "Milestone %s edited" % milestone_name
+    def _ticket_attributes_parse_line(self, line):
+        '''Ex: 72 {"summary":"New ticket"}'''
+        content_match = re.match(" *([0-9]+)( +(.+))?", line)
+        ticket_number = content_match.group(1)
+        attributes = content_match.group(3)
+        if attributes:
+            attributes = json.loads(attributes)
         else:
-            print "Edition aborted of milestone %s" % milestone_name
+            attributes = {}
 
-    def do_milestone_list(self, list):
-        self.pp.pprint(sorted(self.tph.milestone_list()))
-
-    def do_EOF(self, line):
-        return True
+        return (ticket_number, attributes, )
 
     def _parse_date_recent_changes(self, date_time):
         if date_time:
@@ -307,24 +334,6 @@ class TracCmd(cmd.Cmd):
         else:
             date = datetime(month=1, year=1970, day=1)
         return date
-
-    def do_ticket_recent_changes(self, date_time):
-        date = self._parse_date_recent_changes(date_time)
-        print("Report for date %s" % date)
-        changes = self.tph.ticket_recent_changes(
-            date,
-            filter=lambda log:not (
-                log[3] == "comment" \
-                and log[5] == ""
-            )
-        )
-        # recent changes do not show created tickets get the created tickets
-        # from that time
-        self.last_recent_change_date = datetime.utcnow()
-        for change in sorted(changes, key=lambda change:change[1]):
-            #self.pp.pprint(change)
-            self._dump_change(change)
-
 
     def _dump_change(self, change):
         date_tuble = change[1].timetuple()
@@ -366,22 +375,6 @@ class TracCmd(cmd.Cmd):
         else:
             self.pp.pprint(change)
 
-    def do_ticket_recent_changes_save_date(self, date_time):
-        """record the last report date.
-        If a date is given as argument, use that date.
-        Default to the last report date"""
-        assert self.report_last_time_file,\
-            "You must indicate a file in the config file"
-        if date_time:
-            date = self._parse_date(date_time)
-        else:
-            assert self.last_recent_change_date,\
-                "You must give a date or run ticket_recent_changes"
-            date = self.last_recent_change_date
-        with open(self.report_last_time_file, "w") as fi:
-            pickle.dump(date, fi)
-        print "Recorded the last time of the report at %s" % date.strftime("%d/%m/%y %H:%M:%S")
-
     def _parse_date(self, date_time):
         if re.search(date_time, "today"):
             time = datetime.today().replace(
@@ -408,6 +401,9 @@ class TracCmd(cmd.Cmd):
             assert False, "Cannot parse %s for a date" % date_time
 
         return time
+
+    def do_EOF(self, line):
+        return True
 
 TracCmd.do_list_milestones = TracCmd.do_milestone_list
 TracCmd.do_list_methods = TracCmd.do_method_list
