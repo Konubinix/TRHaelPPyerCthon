@@ -183,6 +183,9 @@ class TracCmd(cmd.Cmd):
         else:
             print "Failed to close ticket"
 
+    def do_ticket_summary(self, ticket):
+        print self.tph.ticket_get(int(ticket))[3]["summary"]
+
     def do_list_attachment(self, ticket):
         print self.tph.server.ticket.listAttachments(int(ticket))
 
