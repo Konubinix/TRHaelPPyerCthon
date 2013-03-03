@@ -7,27 +7,31 @@ import subprocess
 import datetime
 import os
 import re
+from attributes import TPHAttributes
+from edit import edit
 
 class TPH(object):
     def __init__(self, server):
         self.server = server
-        self.fields = (
-            'summary',
-            'component',
-            'estimatedhours',
-            'keywords',
-            'cc',
-            'milestone',
-            'owner',
-            'parents',
-            'blockedby',
-            'blocking',
-            'priority',
-            'reporter',
-            'resolution',
-            'startdate',
-            'status',
-            'type',
+        self.attrs = TPHAttributes(
+            (
+                'summary',
+                'component',
+                'estimatedhours',
+                'keywords',
+                'cc',
+                'milestone',
+                'owner',
+                'parents',
+                'blockedby',
+                'blocking',
+                'priority',
+                'reporter',
+                'resolution',
+                'startdate',
+                'status',
+                'type',
+            )
         )
         self.template_attributes = {}
 
@@ -36,7 +40,7 @@ class TPH(object):
             "# " + line for line in info.splitlines()
         ])
         info_string = "\n# lines beginning with # are avoided\n" + info_string
-        comment = self.edit(comment + info_string, prefix=prefix)
+        comment = edit(comment + info_string, prefix=prefix)
         if not comment:
             return None
         # remove the lines beginning with #
@@ -46,65 +50,6 @@ class TPH(object):
         ]
         return "\n".join(new_comment_lines)
 
-    def edit(self, content, suffix=".wiki", prefix=""):
-        temp_file = tempfile.NamedTemporaryFile(prefix=prefix, suffix=suffix, delete=False)
-        temp_file.write(content.encode("utf-8"))
-        temp_file.close()
-        rc = subprocess.call([os.environ["EDITOR"], temp_file.name])
-        if rc == 0:
-            # get the new content and return it
-            with open(temp_file.name, "r") as tfile:
-                new_content = tfile.read().decode("utf-8")
-        else:
-            new_content = None
-
-        os.unlink(temp_file.name)
-        return new_content
-
-    def attributes_dump(self, attributes, ignore_empty=False):
-        content = ""
-        for field in self.fields:
-            value = attributes.get(field, "")
-            if value or not ignore_empty:
-                content = content + field+"="+value+"\n"
-        content = content + attributes.get("description", "")
-        return content
-
-    def attributes_load(self, string):
-        attributes = {}
-        content = string.splitlines()
-        field_regexp = "^([^=]+)=(.*)$"
-        match = re.match(field_regexp, content[0])
-        while match:
-            field_name = match.group(1)
-            field_value = match.group(2)
-            attributes[field_name] = field_value
-            content.pop(0)
-            if len(content) > 0:
-                match = re.match(field_regexp, content[0])
-            else:
-                match = None
-
-        # the remaining of the content is the description
-        description = "\n".join(content)
-        if description:
-            # avoid emptying the description
-            attributes["description"] = description
-        return attributes
-
-    def attributes_edit(self, attributes, prefix="", ignore_empty=False):
-        attributes_string = self.edit(
-            self.attributes_dump(attributes, ignore_empty=ignore_empty),
-            prefix=prefix+"_"
-        )
-        if attributes_string == "":
-            return None
-
-        new_attributes = self.attributes_load(attributes_string)
-        if attributes.get("_ts", None):
-            new_attributes["_ts"] = attributes["_ts"]
-        return new_attributes
-
     def ticket_create(self, p_attributes, use_editor=False):
         attributes = self.template_attributes.copy()
         attributes.update(p_attributes)
@@ -113,7 +58,7 @@ class TPH(object):
         if use_editor:
             attributes["summary"] = summary
             attributes["description"] = description
-            attributes = self.attributes_edit(attributes)
+            attributes = self.attrs.edit(attributes)
             if attributes == None:
                 return None
 
@@ -195,7 +140,7 @@ class TPH(object):
         return self.server.ticket.get(ticket)
 
     def ticket_close(self, ticket):
-        content = self.edit("fixed\n\nComment")
+        content = edit("fixed\n\nComment")
         if content == "":
             return False
         content_split = content.splitlines()
@@ -213,9 +158,9 @@ class TPH(object):
     def ticket_edit(self, ticket_number):
         ticket = self.ticket_get(ticket_number)
         attributes = ticket[3]
-        attributes = self.attributes_edit(attributes, str(ticket_number))
+        attributes = self.attrs.edit(attributes, str(ticket_number))
         if attributes:
-            attributes_string = self.attributes_dump(attributes)
+            attributes_string = self.attrs.dump(attributes)
             comment = self.edit_comment(info=attributes_string, prefix=str(ticket_number))
             if comment is None:
                 return False
@@ -233,9 +178,9 @@ class TPH(object):
         attributes = ticket[3]
         attributes["status"] = "accepted"
         attributes["owner"] = owner
-        attributes = self.attributes_edit(attributes, str(ticket_number))
+        attributes = self.attrs.edit(attributes, str(ticket_number))
         if attributes:
-            attributes_string = self.attributes_dump(attributes)
+            attributes_string = self.attrs.dump(attributes)
             comment = self.edit_comment(
                 comment="Accepted ticket",
                 info=attributes_string,
@@ -271,7 +216,7 @@ class TPH(object):
     def ticket_batch_edit(self, id_list):
         for id in id_list:
             ticket = self.ticket_get(id)
-            attributes = self.attributes_edit(ticket[3])
+            attributes = self.attrs.edit(ticket[3])
             self.server.ticket.update(int(id),
                                       "",
                                       attributes
@@ -306,7 +251,7 @@ class TPH(object):
 
     def template_edit(self):
         attributes = \
-                     self.attributes_edit(self.template_attributes)
+                     self.attrs.edit(self.template_attributes)
         if attributes:
             self.template_attributes = attributes
             return True
@@ -316,14 +261,14 @@ class TPH(object):
     def template_save(self, file_name):
         assert not os.path.exists(file_name)
         with open(file_name, "w") as file:
-            file.write(self.attributes_dump(self.template_attributes))
+            file.write(self.attrs.dump(self.template_attributes))
 
         return True
 
     def template_open(self, file_name):
         assert os.path.exists(file_name)
         with open(file_name, "r") as file:
-            self.template_attributes = self.attributes_load(file.read())
+            self.template_attributes = self.attrs.load(file.read())
 
         return True
 
@@ -336,7 +281,7 @@ class TPH(object):
     def milestone_edit(self, milestone_name):
         milestone = self.server.ticket.milestone.get(milestone_name)
         desc = milestone["description"]
-        new_desc = self.edit(desc, prefix=milestone_name.replace(" ", "_"))
+        new_desc = edit(desc, prefix=milestone_name.replace(" ", "_"))
         if new_desc:
             self.server.ticket.milestone.update(
                 milestone_name,
