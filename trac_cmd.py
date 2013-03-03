@@ -413,7 +413,7 @@ TracCmd.do_list_milestones = TracCmd.do_milestone_list
 TracCmd.do_list_methods = TracCmd.do_method_list
 TracCmd.do_help_method = TracCmd.do_method_help
 
-def main():
+def get_configuration_options():
     config = ConfigParser.ConfigParser()
     config.optionxform = str    # keys not converted into lower case
     config.read(os.environ.get("TRAC_CMDRC",
@@ -423,6 +423,15 @@ def main():
     trac_path = config.get("server", "trac_path")
     last_time_file = config.get("report", "last_time_file")
     (login, server) = trac_connection.from_netrc(url, protocol, trac_path)
+    return (login, server, protocol, url, trac_path, last_time_file)
+
+def main():
+    (login,
+     server,
+     protocol,
+     url,
+     trac_path,
+     last_time_file) = get_configuration_options()
     TracCmd(server,
             login=login,
             url="%(PROTOCOL)s://%(URL)s%(PATH)s" % {
