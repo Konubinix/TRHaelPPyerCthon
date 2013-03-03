@@ -339,10 +339,14 @@ class TracCmd(cmd.Cmd):
         print "  At %s" % (date.strftime("%d/%m/%y %H:%M:%S"),)
         print "%s" % change[2],
         print "Ticket : %s" % change[0],
-        if change[3] == "comment":
-            print "Added comment : %s" % change[5]
+        if re.search("comment", change[3]):
+            print "Added/Edited comment : %s" % change[5].splitlines()[0]
         elif change[3] == "description":
             print "changed the description of the ticket"
+        elif change[3] == "created":
+            print "created the ticket"
+        elif change[3] == "component":
+            print "moved the component from %s to %s" % (change[4], change[5],)
         elif change[3] == "status":
             print "changed the status from %s to %s" % (change[4], change[5],)
         elif change[3] == "estimatedhours":
