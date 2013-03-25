@@ -271,7 +271,9 @@ class TPH(object):
             return False
 
     def template_save(self, file_name):
-        assert not os.path.exists(file_name)
+        if os.path.exists(file_name):
+            "The file %s will be erased"
+            os.unlink(file_name)
         with open(file_name, "w") as file:
             file.write(self.attrs.dump(self.template_attributes))
 
