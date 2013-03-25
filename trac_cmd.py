@@ -330,6 +330,33 @@ class TracCmd(cmd.Cmd):
             stderr=subprocess.PIPE
         )
 
+    def _ticket_remaining_time(self, ticket_numbers):
+        total = 0
+        for ticket_number in ticket_numbers:
+            value = self.tph.ticket_remaining_time(ticket_number)
+            total += value
+            print ticket_number,value
+        if len(ticket_numbers) > 1:
+            print "---"
+            print "Total :",total
+    def _ticket_edit_batch(self, ticket_numbers):
+        attributes = {
+            field : ""
+            for field in self.tph.attrs.fields
+        }
+        attributes = self.tph.attrs.edit(attributes)
+        comment = edit("Comment")
+        for ticket_number in ticket_numbers:
+            print "Editing ticket %s" % ticket_number
+
+            if self.tph.server.ticket.update(
+                    ticket_number,
+                    comment,
+                    attributes
+            ):
+                print "Ticket %s edited" % (ticket_number)
+            else:
+                print "Edition aborted"
     def _ticket_attributes_parse_line(self, line):
         '''Ex: 72 {"summary":"New ticket"}'''
         content_match = re.match(" *([0-9]+)( +(.+))?", line)
