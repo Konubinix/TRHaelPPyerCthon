@@ -376,6 +376,10 @@ class TracCmd(cmd.Cmd):
             print "created the ticket"
         elif change[3] == "component":
             print "moved the component from %s to %s" % (change[4], change[5],)
+        elif change[3] == "summary":
+            print "updated summary : %s" % (change[5],)
+        elif change[3] == "blocking":
+            print "update blocking from %s to %s" % (change[4], change[5],)
         elif change[3] == "status":
             print "changed the status from %s to %s" % (change[4], change[5],)
         elif change[3] == "estimatedhours":
