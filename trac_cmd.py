@@ -233,7 +233,7 @@ class TracCmd(cmd.Cmd):
                 "You should provide the template file or set TRAC_CMD_TEMPLATE_FILE"
             filename = self.template_file
         if self.tph.template_save(filename):
-            print "Template file saved in %s" (filename,)
+            print "Template file saved in %s" % (filename,)
         else:
             print "Template file not saved"
 
