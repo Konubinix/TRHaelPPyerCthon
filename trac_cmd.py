@@ -256,6 +256,9 @@ class TracCmd(cmd.Cmd):
     def do_milestone_list(self, list):
         self.pp.pprint(sorted(self.tph.milestone_list()))
 
+    def do_milestone_remaining_time_sum(self, milestone_name):
+        print self.tph.milestone_time_sum(milestone_name)
+
     def do_wiki_search(self, query):
         self.pp.pprint(
             self.tph.server.search.performSearch(
