@@ -221,6 +221,9 @@ class TracCmd(cmd.Cmd):
         for change in changelog:
             self._dump_change(change)
 
+    def do_ticket_query_time_sum(self, query):
+        print self.tph.ticket_query_time_sum(query)
+
     def do_template_edit(self, line):
         if self.tph.template_edit():
             print "Edited template"
