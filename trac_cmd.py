@@ -270,10 +270,10 @@ class TracCmd(cmd.Cmd):
     def do_list_attachment(self, ticket):
         print self.tph.server.ticket.listAttachments(int(ticket))
 
-    def do_list_components(self, filter):
-        self.pp.pprint(
-            self.tph.list_components(filter)
-        )
+    def do_list_components(self, match):
+        filter = lambda x:re.search(match, x, re.I)
+        for comp in self.tph.list_components(filter):
+            print comp
 
     def do_list_resolution(self, line):
         self.pp.pprint(self.tph.server.ticket.resolution.getAll())
