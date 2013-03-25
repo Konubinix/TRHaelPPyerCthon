@@ -7,6 +7,8 @@ import subprocess
 import datetime
 import os
 import re
+import xmlrpclib
+
 from attributes import TPHAttributes
 from edit import edit
 
@@ -260,6 +262,32 @@ class TPH(object):
         for ticket in tickets:
             changelogs = changelogs + self.ticket_changelog(ticket, new_filter)
         return created_tickets_changelogs + changelogs
+
+    def ticket_attachments_put(self, ticket, files_desc, override=False):
+        attachments = set(self.ticket_attachments_list(ticket))
+        files = set([os.path.basename(fil) for fil in files_desc.keys()])
+        # make sure the attachments won't be overridden if not precised
+        assert not (attachments.intersection(files) and override)
+        done_files = []
+        for fil in files_desc:
+            basename = os.path.basename(fil)
+            content = ""
+            with open(fil, "rb") as fil_:
+                content = fil_.read()
+
+            done_files.append(
+                self.server.ticket.putAttachment(
+                    ticket,
+                    basename,
+                    files_desc[fil],
+                    xmlrpclib.Binary(content),
+                    True
+                )
+            )
+        return done_files
+
+    def ticket_attachments_list(self, ticket):
+        return self.server.ticket.listAttachments(ticket)
 
     def template_edit(self):
         attributes = \
