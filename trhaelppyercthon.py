@@ -205,7 +205,11 @@ class TPH(object):
     def ticket_remaining_time(self, ticket_number):
         ticket = self.ticket_get(ticket_number)
         attributes = ticket[3]
-        return int(attributes["estimatedhours"])
+        if attributes["estimatedhours"]:
+            hours = int(attributes["estimatedhours"])
+        else:
+            hours = 0
+        return hours
 
     def ticket_remaining_time_sum(self, ticket_number):
         time = self.ticket_remaining_time(ticket_number)
