@@ -15,6 +15,8 @@ import re
 import pickle
 from datetime import datetime
 from trhaelppyercthon import TPH
+from attributes import TPHAttributes
+from edit import edit
 
 class TracCmd(cmd.Cmd):
     def __init__(self, server, login="", url="", template_file="", report_last_time_file=""):
@@ -223,6 +225,32 @@ class TracCmd(cmd.Cmd):
 
     def do_ticket_query_time_sum(self, query):
         print self.tph.ticket_query_time_sum(query)
+
+    def do_ticket_attach_list(self, ticket):
+        print self.tph.ticket_attachments_list(ticket)
+
+    def do_ticket_attach_put(self, ticket_attachs):
+        args = re.split(" +", ticket_attachs)
+        ticket = args[0]
+        assert re.search("^[0-9]+$", ticket)
+        attach_files = args[1:]
+        assert attach_files
+        files = {}
+        for fil in attach_files:
+            desc = edit("""%s
+
+Description""" % fil)
+            if not desc:
+                print "Attachment put aborted"
+                return
+            match = re.search("^[^\n]+\n\n(.+)$", desc)
+            desc = match.group(1)
+            files[fil] = desc
+        print self.tph.ticket_attachments_put(
+            ticket,
+            files
+        )
+        print "Files attached to the ticket"
 
     def do_template_edit(self, line):
         if self.tph.template_edit():
