@@ -309,3 +309,6 @@ class TPH(object):
 
     def milestone_list(self):
         return self.server.ticket.milestone.getAll()
+
+    def milestone_time_sum(self, milestone_name):
+        return self.ticket_query_time_sum("milestone=%s&status=!closed" % milestone_name)
