@@ -217,6 +217,14 @@ class TPH(object):
             time += self.ticket_remaining_time_sum(child)
         return time
 
+    def ticket_query_time_sum(self, query):
+        tickets = self.server.ticket.query(query)
+        time = 0
+        for ticket in tickets:
+            time += self.ticket_remaining_time(ticket)
+
+        return time
+
     def ticket_batch_edit(self, id_list):
         for id in id_list:
             ticket = self.ticket_get(id)
