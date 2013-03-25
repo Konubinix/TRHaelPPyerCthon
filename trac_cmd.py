@@ -191,6 +191,14 @@ class TracCmd(cmd.Cmd):
             else:
                 print "Edition aborted"
 
+    def do_ticket_edit_batch(self, tickets):
+        tickets = [int(ticket) for ticket in tickets.split(" ")]
+        self._ticket_edit_batch(tickets)
+
+    def do_ticket_query_edit_batch(self, query):
+        tickets = self.tph.server.ticket.query(query)
+        self._ticket_edit_batch(tickets)
+
     def do_ticket_changelog(self, line):
         """Args: ticket number_of_changes
         number_of_changes default to 10
