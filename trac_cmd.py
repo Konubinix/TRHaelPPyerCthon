@@ -108,9 +108,9 @@ class TracCmd(cmd.Cmd):
         else:
             print "Abort the acceptation of the ticket %s" % ticket_number
 
-    def do_ticket_remaining_time(self, ticket_number):
-        assert ticket_number, "argument cannot be empty"
-        print self.tph.ticket_remaining_time(ticket_number)
+    def do_ticket_remaining_time(self, ticket_numbers):
+        assert ticket_numbers, "argument cannot be empty"
+        ticket_numbers = ticket_numbers.split(" ")
 
     def do_ticket_remaining_time_sum(self, ticket_number):
         assert ticket_number, "argument cannot be empty"
