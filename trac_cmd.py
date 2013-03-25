@@ -111,6 +111,12 @@ class TracCmd(cmd.Cmd):
     def do_ticket_remaining_time(self, ticket_numbers):
         assert ticket_numbers, "argument cannot be empty"
         ticket_numbers = ticket_numbers.split(" ")
+        self._ticket_remaining_time(ticket_numbers)
+
+    def do_ticket_query_remaining_time(self, query):
+        assert query, "argument cannot be empty"
+        ticket_numbers = self.tph.server.ticket.query(query)
+        self._ticket_remaining_time(ticket_numbers)
 
     def do_ticket_remaining_time_sum(self, ticket_number):
         assert ticket_number, "argument cannot be empty"
