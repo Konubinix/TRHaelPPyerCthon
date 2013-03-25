@@ -16,7 +16,7 @@ class TPHAttributes(object):
         the fields are relevant for edition. For instance, _ts or datetime are
         not meant to be edited.
         """
-        self._fields = fields
+        self.fields = fields
 
     def dump(self, attributes, ignore_empty=False):
         """From a dictionary of attributes, return a string to be edited.
@@ -27,7 +27,7 @@ class TPHAttributes(object):
         - `ignore_empty`:If true, do not display anything for empty fields.
         """
         content = ""
-        for field in self._fields:
+        for field in self.fields:
             value = attributes.get(field, "")
             if value or not ignore_empty:
                 content = content + field+"="+value+"\n"
