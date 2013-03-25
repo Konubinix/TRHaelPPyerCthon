@@ -182,11 +182,14 @@ class TracCmd(cmd.Cmd):
             )
         )
 
-    def do_ticket_edit(self, ticket_number):
-        if self.tph.ticket_edit(int(ticket_number)):
-            print "Ticket %s edited" % (ticket_number)
-        else:
-            print "Edition aborted"
+    def do_ticket_edit(self, ticket_numbers):
+        ticket_numbers = ticket_numbers.split(" ")
+        for ticket_number in ticket_numbers:
+            print "Editing ticket %s" % ticket_number
+            if self.tph.ticket_edit(int(ticket_number)):
+                print "Ticket %s edited" % (ticket_number)
+            else:
+                print "Edition aborted"
 
     def do_ticket_changelog(self, line):
         """Args: ticket number_of_changes
