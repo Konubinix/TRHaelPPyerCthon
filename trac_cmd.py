@@ -305,7 +305,7 @@ Description""" % fil)
 
     def do_list_components(self, match):
         filter = lambda x:re.search(match, x, re.I)
-        for comp in self.tph.list_components(filter):
+        for comp in self.tph.component_list(filter):
             print comp
 
     def do_list_resolution(self, line):
