@@ -314,7 +314,7 @@ class TPH(object):
 
         return True
 
-    def list_components(self, filter):
+    def list_components(self, filter=lambda x:True):
         return [
             comp for comp in self.server.ticket.component.getAll()
             if filter(comp)
