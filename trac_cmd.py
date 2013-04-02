@@ -284,8 +284,10 @@ Description""" % fil)
         else:
             print "Edition aborted of milestone %s" % milestone_name
 
-    def do_milestone_list(self, list):
-        self.pp.pprint(sorted(self.tph.milestone_list()))
+    def do_milestone_list(self, match):
+        filter = lambda x:re.search(match, x, re.I)
+        for milestone in self.tph.milestone_list(filter):
+            print milestone
 
     def do_milestone_remaining_time_sum(self, milestone_name):
         print self.tph.milestone_time_sum(milestone_name)

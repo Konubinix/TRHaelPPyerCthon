@@ -335,8 +335,11 @@ class TPH(object):
 
         return False
 
-    def milestone_list(self):
-        return self.server.ticket.milestone.getAll()
+    def milestone_list(self, filter=lambda x:True):
+        return [
+            milestone for milestone in self.server.ticket.milestone.getAll()
+            if filter(milestone)
+        ]
 
     def milestone_time_sum(self, milestone_name):
         return self.ticket_query_time_sum("milestone=%s&status=!closed" % milestone_name)
