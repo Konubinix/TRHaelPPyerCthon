@@ -263,8 +263,8 @@ class TPH(object):
             changelogs = changelogs + self.ticket_changelog(ticket, new_filter)
         return created_tickets_changelogs + changelogs
 
-    def ticket_attachments_put(self, ticket, files_desc, override=False):
-        attachments = set(self.ticket_attachments_list(ticket))
+    def ticket_attachment_put(self, ticket, files_desc, override=False):
+        attachments = set(self.ticket_attachment_list(ticket))
         files = set([os.path.basename(fil) for fil in files_desc.keys()])
         # make sure the attachments won't be overridden if not precised
         assert not (attachments.intersection(files) and override)
@@ -286,7 +286,7 @@ class TPH(object):
             )
         return done_files
 
-    def ticket_attachments_list(self, ticket):
+    def ticket_attachment_list(self, ticket):
         return self.server.ticket.listAttachments(ticket)
 
     def template_edit(self):

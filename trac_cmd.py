@@ -227,7 +227,7 @@ class TracCmd(cmd.Cmd):
         print self.tph.ticket_query_time_sum(query)
 
     def do_ticket_attach_list(self, ticket):
-        print self.tph.ticket_attachments_list(ticket)
+        print self.tph.ticket_attachment_list(ticket)
 
     def do_ticket_attach_put(self, ticket_attachs):
         args = re.split(" +", ticket_attachs)
@@ -246,7 +246,7 @@ Description""" % fil)
             match = re.search("^[^\n]+\n\n(.+)$", desc)
             desc = match.group(1)
             files[fil] = desc
-        print self.tph.ticket_attachments_put(
+        print self.tph.ticket_attachment_put(
             ticket,
             files
         )
