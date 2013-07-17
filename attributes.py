@@ -45,7 +45,7 @@ class TPHAttributes(object):
         """
         attributes = {}
         content = string.splitlines()
-        field_regexp = "^([^=]+)=(.*)$"
+        field_regexp = "^([^= ]+)=(.*)$"
         match = re.match(field_regexp, content[0])
         while match:
             field_name = match.group(1)
@@ -91,3 +91,41 @@ class TPHAttributes(object):
         if attributes.get("_ts", None):
             new_attributes["_ts"] = attributes["_ts"]
         return new_attributes
+
+    def merge(self, old, new, only_new_fields=False):
+        """Add the information of new attributes into the old ones. For most of
+the attributes work, the value is replaced in the old value by the new one."""
+        result_fields = {}
+        for key in new.keys():
+            if key in ("keywords", "cc"):
+                if new[key] == "":
+                    new_values = set()
+                else:
+                    new_values = set(re.split("[ ,]+", new[key]))
+                if old[key] == "":
+                    old_values = set()
+                else:
+                    old_values = set(re.split("[ ,]+", old[key]))
+                # value -> toggle the value
+                # +value -> add the value
+                # -value -> remove the value
+                for value in new_values:
+                    if value.startswith("+"):
+                        old_values.add(value[1:])
+                    elif value.startswith("-"):
+                        if value[1:] in old_values:
+                            old_values.remove(value[1:])
+                    else:
+                        if value in old_values:
+                            old_values.remove(value)
+                        else:
+                            old_values.add(value)
+                result_fields[key] = " ".join(list(old_values))
+            else:
+                result_fields[key] = new[key]
+            if not only_new_fields:
+                old[key] = result_fields[key]
+        if only_new_fields:
+            return result_fields
+        else:
+            return old
