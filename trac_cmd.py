@@ -41,7 +41,6 @@ class TracCmd(cmd.Cmd):
 
     def do_ticket_create(self, line):
         attributes = {
-            "type":"Defect",
             "reporter":self.me,
             "status":"new",
         }
