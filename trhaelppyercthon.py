@@ -96,7 +96,7 @@ class TPH(object):
             "keywords" : "",    # new set of keywords
             "milestone" : ticket_old_attributes["milestone"],
             "owner" : ticket_old_attributes["owner"],
-            "parents" : "#" + str(ticket[0]),
+            "parents" : str(ticket[0]),
             "priority" : ticket_old_attributes["priority"],
             "reporter" : reporter,
             "summary" : ticket_old_attributes["summary"] + " - Sub ticket",
