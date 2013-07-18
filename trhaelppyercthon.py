@@ -69,7 +69,7 @@ class TPH(object):
             description,
             attributes)
 
-    def ticket_clone(self, ticket_number, attributes, use_editor=False, reporter=""):
+    def ticket_clone(self, ticket_number, attributes={}, use_editor=False, reporter=""):
         # get the ticket to clone
         ticket = self.ticket_get(ticket_number)
         ticket_attributes = ticket[3]
@@ -84,7 +84,7 @@ class TPH(object):
 
         return self.ticket_create(ticket_attributes, use_editor)
 
-    def ticket_son_create(self, ticket_number, attributes, use_editor=False, reporter=""):
+    def ticket_son_create(self, ticket_number, attributes={}, use_editor=False, reporter=""):
         # get the ticket to clone
         ticket = self.ticket_get(ticket_number)
         ticket_old_attributes = ticket[3]
