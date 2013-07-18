@@ -13,6 +13,7 @@ import json
 import trac_connection
 import re
 import pickle
+import shlex
 from datetime import datetime
 from trhaelppyercthon import TPH
 from attributes import TPHAttributes
@@ -201,6 +202,22 @@ class TracCmd(cmd.Cmd):
     def do_ticket_query_edit(self, query):
         tickets = self.tph.server.ticket.query(query)
         self._ticket_edit(tickets)
+
+    def do_ticket_query_print(self, line):
+        [query, field] = shlex.split(line)
+        assert field, "Field must be given"
+        assert query, "Query must be given"
+        tickets = self.tph.server.ticket.query(query)
+        for ticket in tickets:
+            print ticket, self.tph.ticket_get(ticket)[3][field]
+
+    def do_ticket_print(self, query):
+        items = re.split(" +", query)
+        assert len(items) > 1
+        tickets = items[0:-1]
+        field = items[-1]
+        for ticket in tickets:
+            print ticket, self.tph.ticket_get(ticket)[3][field]
 
     def do_ticket_query_edit_batch(self, query):
         tickets = self.tph.server.ticket.query(query)
