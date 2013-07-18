@@ -15,6 +15,7 @@ import re
 import pickle
 import shlex
 from datetime import datetime
+from datetime import timedelta
 from trhaelppyercthon import TPH
 from attributes import TPHAttributes
 from edit import edit
@@ -521,13 +522,11 @@ Description""" % fil)
         elif re.search(date_time, "now"):
             time = datetime.utcnow()
         elif re.search(date_time, "yesterday"):
-            time = datetime.today()
-            time = time.replace(
-                day = time.day - 1,
+            time = datetime.today().replace(
                 hour = 0,
                 minute = 0,
                 second = 0
-            )
+            ) + timedelta(-1)
         elif date_time.__class__ == str:
             time = datetime.strptime(
                 date_time,
