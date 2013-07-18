@@ -324,6 +324,22 @@ Description""" % fil)
     def do_milestone_remaining_time_sum(self, milestone_name):
         print self.tph.milestone_time_sum(milestone_name)
 
+    def do_milestone_stuck_p(self, milestone_name):
+        """The milestone is stuck if one of its tickets is blocked by a tickets
+not closed or not into the milestone"""
+        ticket_numbers = self.tph.server.ticket.query("milestone=%s&blockedby!=" % milestone_name)
+        # for each ticket, find out if its blockers are scheduled
+        for ticket_number in ticket_numbers:
+            ticket = self.tph.ticket_get(int(ticket_number))
+            blocking_ticket_numbers = re.split("[ ,]+", ticket[3]["blockedby"])
+            for blocking_ticket_number in blocking_ticket_numbers:
+                blocking_ticket = self.tph.ticket_get(int(blocking_ticket_number))
+                if blocking_ticket[3]["status"] != "closed" \
+                   and blocking_ticket[3]["milestone"] != milestone_name:
+                    print "%s is blocked by %s not in current milestone" % (
+                        ticket_number, blocking_ticket_number
+                    )
+
     def do_wiki_search(self, query):
         self.pp.pprint(
             self.tph.server.search.performSearch(
