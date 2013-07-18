@@ -311,6 +311,28 @@ class TPH(object):
 
         return children
 
+    def wiki_attachment_put(self, page, file_names, override=False):
+        attachments = set(self.wiki_attachment_list(page))
+        # make sure the attachments won't be overridden if not precised
+        assert not (attachments.intersection(file_names) and override)
+        done_files = []
+        for fil in file_names:
+            basename = os.path.basename(fil)
+            path = page + "/" + basename
+            content = ""
+            with open(fil, "rb") as fil_:
+                content = fil_.read()
+
+            self.server.wiki.putAttachment(
+                path,
+                xmlrpclib.Binary(content),
+            )
+            done_files.append(path)
+        return done_files
+
+    def wiki_attachment_list(self, page):
+        return self.server.wiki.listAttachments(page)
+
     def template_edit(self):
         attributes = \
                      self.attrs.edit(self.template_attributes)
