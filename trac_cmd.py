@@ -368,6 +368,33 @@ not closed or not into the milestone"""
     def do_list_type(self, line):
         self.pp.pprint(self.tph.server.ticket.type.getAll())
 
+    def do_wiki_attach_list(self, page):
+        for attachment in self.tph.wiki_attachment_list(page):
+            print attachment
+
+    def do_wiki_attach_put(self, page_attachs):
+        args = re.split(" +", page_attachs)
+        page = args[0]
+        attach_files = args[1:]
+        assert attach_files
+        files = {}
+
+        print self.tph.wiki_attachment_put(
+            page,
+            attach_files
+        )
+        print "Files attached to the page"
+
+    def do_wiki_attach_delete(self, page_attachs):
+        attachments = re.split(" +", page_attachs)
+        assert attachments
+
+        for attachment in attachments:
+            self.tph.server.wiki.deleteAttachment(
+                attachment
+            )
+            print "File %s deleted" % attachment
+
     def do_method_list(self, line):
         for method in self.tph.server.system.listMethods():
             print method
