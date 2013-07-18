@@ -259,7 +259,6 @@ class TPH(object):
                     ticket_log
                 )
 
-
         changelogs = []
         for ticket in tickets:
             changelogs = changelogs + self.ticket_changelog(ticket, new_filter)
@@ -290,6 +289,27 @@ class TPH(object):
 
     def ticket_attachment_list(self, ticket):
         return self.server.ticket.listAttachments(ticket)
+
+    def ticket_split(self, ticket, number, use_editor=False):
+        """Split the ticket into number subtickets and ask the user to edit each of
+        them. Also set the remaining time of ticket to 0.
+        If one edition is aborted, stop here
+        """
+        children = []
+        import ipdb
+        ipdb.set_trace()
+
+        for i in range(0, number):
+            child = self.ticket_son_create(ticket, use_editor=use_editor)
+            if not child:
+                return children
+            children.append(child)
+
+        self.ticket_edit(
+            ticket, {"estimatedhours" : "0"},
+            "parent_ticket_%s" % ticket)
+
+        return children
 
     def template_edit(self):
         attributes = \
