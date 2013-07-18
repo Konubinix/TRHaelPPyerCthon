@@ -179,6 +179,9 @@ class TracCmd(cmd.Cmd):
     def do_ticket_summary(self, ticket):
         print self.tph.ticket_get(int(ticket))[3]["summary"]
 
+    def do_ticket_description(self, ticket):
+        print self.tph.ticket_get(int(ticket))[3]["description"]
+
     def do_ticket_search(self, query):
         self.pp.pprint(
             self.tph.server.search.performSearch(
