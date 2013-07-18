@@ -192,16 +192,15 @@ class TracCmd(cmd.Cmd):
 
     def do_ticket_edit(self, ticket_numbers):
         ticket_numbers = ticket_numbers.split(" ")
-        for ticket_number in ticket_numbers:
-            print "Editing ticket %s" % ticket_number
-            if self.tph.ticket_edit(int(ticket_number)):
-                print "Ticket %s edited" % (ticket_number)
-            else:
-                print "Edition aborted"
+        self._ticket_edit(ticket_numbers)
 
     def do_ticket_edit_batch(self, tickets):
-        tickets = [int(ticket) for ticket in tickets.split(" ")]
+        tickets = self._ticket_list_parse(tickets)
         self._ticket_edit_batch(tickets)
+
+    def do_ticket_query_edit(self, query):
+        tickets = self.tph.server.ticket.query(query)
+        self._ticket_edit(tickets)
 
     def do_ticket_query_edit_batch(self, query):
         tickets = self.tph.server.ticket.query(query)
@@ -257,6 +256,15 @@ Description""" % fil)
             files
         )
         print "Files attached to the ticket"
+
+    def do_ticket_split(self, ticket_n_number):
+        args = re.split(" +", ticket_n_number)
+        ticket = args[0]
+        number = args[1]
+        assert ticket and re.search("^[0-9]+$", ticket)
+        assert number and re.search("^[0-9]+$", number)
+        tickets = self.tph.ticket_split(int(ticket), int(number), use_editor=True)
+        print "Ticket %s split into %s" (ticket, tickets)
 
     def do_template_edit(self, line):
         if self.tph.template_edit():
@@ -378,6 +386,18 @@ Description""" % fil)
         if len(ticket_numbers) > 1:
             print "---"
             print "Total :",total
+
+    def _ticket_edit(self, ticket_numbers):
+        total = len(ticket_numbers)
+        print "%s tickets to edit" % total
+        for ticket_number in ticket_numbers:
+            print "Editing ticket %s" % ticket_number
+            if self.tph.ticket_edit(int(ticket_number)):
+                total -= 1
+                print "Ticket %s edited, %s left" % (ticket_number, total)
+            else:
+                print "Edition aborted"
+
     def _ticket_edit_batch(self, ticket_numbers):
         attributes = {
             field : ""
