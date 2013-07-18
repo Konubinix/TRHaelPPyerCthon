@@ -98,6 +98,10 @@ class TracCmd(cmd.Cmd):
         assert ticket_number, "argument cannot be empty"
         print self.tph.ticket_sons(ticket_number)
 
+    def do_ticket_sons_recursive(self, ticket_number):
+        assert ticket_number, "argument cannot be empty"
+        self._ticket_sons_recursive(ticket_number, "")
+
     def do_ticket_parents(self, ticket_number):
         assert ticket_number, "argument cannot be empty"
         print self.tph.ticket_parents(int(ticket_number))
@@ -457,6 +461,11 @@ Description""" % fil)
             print "changed priority form %s to %s" % (change[4], change[5],)
         else:
             self.pp.pprint(change)
+
+    def _ticket_sons_recursive(self, ticket_number, indent):
+        print indent + str(ticket_number)
+        for son in self.tph.ticket_sons(ticket_number):
+            self._ticket_sons_recursive(son, indent + "  ")
 
     def _parse_date(self, date_time):
         if re.search(date_time, "today"):
