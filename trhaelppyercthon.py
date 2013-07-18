@@ -102,7 +102,6 @@ class TPH(object):
             "summary" : ticket_old_attributes["summary"] + " - Sub ticket",
             "status" : "new",
             "description" : ticket_old_attributes["description"],
-            'type': 'Defect',
         }
         ticket_attributes.update(attributes)
         return self.ticket_create(ticket_attributes, use_editor)
