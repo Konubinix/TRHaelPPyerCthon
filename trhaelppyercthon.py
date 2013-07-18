@@ -156,10 +156,13 @@ class TPH(object):
                               )
         return True
 
-    def ticket_edit(self, ticket_number):
+    def ticket_edit(self, ticket_number, new_attributes={}, name=""):
+        if not name:
+            name = str(ticket_number)
         ticket = self.ticket_get(ticket_number)
         attributes = ticket[3]
-        attributes = self.attrs.edit(attributes, str(ticket_number))
+        attributes.update(new_attributes)
+        attributes = self.attrs.edit(attributes, name)
         if attributes:
             attributes_string = self.attrs.dump(attributes)
             comment = self.edit_comment(info=attributes_string, prefix=str(ticket_number))
