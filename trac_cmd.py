@@ -387,18 +387,20 @@ not closed or not into the milestone"""
     def do_whoami(self, line):
         print self.me
 
-    def do_web(self, ticket):
-        url="%(URL)s/ticket/%(TICKET)s" % {
-            "URL" : self.url,
-            "TICKET" : ticket,
-        }
-        subprocess.Popen(
-            [os.environ['BROWSER'],
-             url
-         ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
+    def do_web(self, tickets):
+        tickets = re.split(" +", tickets)
+        for ticket in tickets:
+            url="%(URL)s/ticket/%(TICKET)s" % {
+                "URL" : self.url,
+                "TICKET" : ticket,
+            }
+            subprocess.Popen(
+                [os.environ['BROWSER'],
+                 url
+             ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
 
     def do__dump_ticket(self, ticket):
         self.pp.pprint(self.tph.ticket_get(int(ticket)))
