@@ -558,6 +558,8 @@ not closed or not into the milestone"""
             print "changed parents form %s to %s" % (change[4], change[5],)
         elif change[3] == "priority":
             print "changed priority form %s to %s" % (change[4], change[5],)
+        elif change[3] == "score":
+            print "changed score form %s to %s" % (change[4], change[5],)
         else:
             self.pp.pprint(change)
 
