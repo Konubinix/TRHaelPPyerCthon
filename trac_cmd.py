@@ -408,6 +408,10 @@ Description""" % fil)
 
         return (ticket_number, attributes, )
 
+    def _ticket_list_parse(self, line):
+        return [int(ticket.replace("#", ""))
+                for ticket in re.split("#? +", line)]
+
     def _parse_date_recent_changes(self, date_time):
         if date_time:
             date = self._parse_date(date_time)
