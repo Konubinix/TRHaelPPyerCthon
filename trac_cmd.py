@@ -20,7 +20,7 @@ from trhaelppyercthon import TPH
 from attributes import TPHAttributes
 from edit import edit
 
-class TracCmd(cmd.Cmd):
+class TracCmd(cmd.Cmd, object):
     def __init__(self, server, login="", url="", template_file="", report_last_time_file=""):
         cmd.Cmd.__init__(self)
         self.tph = TPH(server)
