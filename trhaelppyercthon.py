@@ -112,7 +112,8 @@ class TPH(object):
         for id in id_list:
             self.server.ticket.update(int(id),
                                       "",
-                                      attributes
+                                      attributes,
+                                      True
                                   )
 
     def ticket_sibling_create(self, ticket_number, attributes, use_editor=False, reporter=""):
@@ -154,7 +155,8 @@ class TPH(object):
                                   {
                                       'action':'resolve',
                                       'action_resolve_resolve_resolution': resolution,
-                                  }
+                                  },
+                                  True
                               )
         return True
 
@@ -173,7 +175,8 @@ class TPH(object):
             self.server.ticket.update(
                 ticket[0],
                 comment,
-                attributes
+                attributes,
+                True
             )
             return True
         else:
@@ -196,7 +199,8 @@ class TPH(object):
             self.server.ticket.update(
                 ticket[0],
                 comment,
-                attributes
+                attributes,
+                True
             )
             return True
         else:
@@ -237,7 +241,8 @@ class TPH(object):
             attributes = self.attrs.edit(ticket[3])
             self.server.ticket.update(int(id),
                                       "",
-                                      attributes
+                                      attributes,
+                                      True
                                   )
 
     def ticket_changelog(self, ticket, filter=lambda x:True):
