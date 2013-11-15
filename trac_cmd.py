@@ -417,7 +417,7 @@ not closed or not into the milestone"""
     def do_whoami(self, line):
         print self.me
 
-    def do_web(self, tickets):
+    def do_ticket_web(self, tickets):
         tickets = re.split(" +", tickets)
         for ticket in tickets:
             url="%(URL)s/ticket/%(TICKET)s" % {
