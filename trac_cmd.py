@@ -492,14 +492,19 @@ not closed or not into the milestone"""
             print "Merging attributes"
             ticket = self.tph.ticket_get(ticket_number)
             new_attributes = self.tph.attrs.merge(ticket[3], attributes, True)
-            if self.tph.server.ticket.update(
-                    ticket_number,
-                    comment,
-                    new_attributes
-            ):
-                print "Ticket %s edited" % (ticket_number)
+            # handle the special case where nothing has changed
+            if new_attributes == ticket[3]:
+                print "Nothing to do for ticket %s" % ticket_number
             else:
-                print "Edition aborted"
+                if self.tph.server.ticket.update(
+                        ticket_number,
+                        comment,
+                        new_attributes,
+                        True
+                ):
+                    print "Ticket %s edited" % (ticket_number)
+                else:
+                    print "Failed to edit ticket %s" % (ticket_number)
 
     def _ticket_attributes_parse_line(self, line):
         '''Ex: 72 {"summary":"New ticket"}'''
