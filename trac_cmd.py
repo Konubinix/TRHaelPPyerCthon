@@ -426,6 +426,22 @@ not closed or not into the milestone"""
             }
             self._open_in_browser(url)
 
+    def do_ticket_query_web(self, query):
+        tickets = self.tph.server.ticket.query(query)
+        for ticket in tickets:
+            url="%(URL)s/ticket/%(TICKET)s" % {
+                "URL" : self.url,
+                "TICKET" : ticket,
+            }
+            self._open_in_browser(url)
+
+    def do_wiki_web(self, page):
+        url="%(URL)s/wiki/%(WIKI)s" % {
+            "URL" : self.url,
+            "WIKI" : page,
+        }
+        self._open_in_browser(url)
+
     def do__dump_ticket(self, ticket):
         self.pp.pprint(self.tph.ticket_get(int(ticket)))
 
