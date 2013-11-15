@@ -331,8 +331,10 @@ class TPH(object):
             with open(fil, "rb") as fil_:
                 content = fil_.read()
 
-            self.server.wiki.putAttachment(
-                path,
+            self.server.wiki.putAttachmentEx(
+                page,
+                basename,
+                "",
                 xmlrpclib.Binary(content),
             )
             done_files.append(path)
