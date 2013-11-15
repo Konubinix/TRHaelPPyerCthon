@@ -424,13 +424,7 @@ not closed or not into the milestone"""
                 "URL" : self.url,
                 "TICKET" : ticket,
             }
-            subprocess.Popen(
-                [os.environ['BROWSER'],
-                 url
-             ],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
-            )
+            self._open_in_browser(url)
 
     def do__dump_ticket(self, ticket):
         self.pp.pprint(self.tph.ticket_get(int(ticket)))
@@ -570,6 +564,15 @@ not closed or not into the milestone"""
         print indent + str(ticket_number)
         for son in self.tph.ticket_sons(ticket_number):
             self._ticket_sons_recursive(son, indent + "  ")
+
+    def _open_in_browser(self, url):
+        subprocess.Popen(
+            [os.environ['BROWSER'],
+             url
+         ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
 
     def _parse_date(self, date_time):
         if re.search(date_time, "today"):
