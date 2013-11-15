@@ -310,12 +310,13 @@ class TPH(object):
         for i in range(0, number):
             child = self.ticket_son_create(ticket, use_editor=use_editor)
             if not child:
-                return children
+                break
             children.append(child)
 
-        self.ticket_edit(
-            ticket, {"estimatedhours" : "0"},
-            "parent_ticket_%s" % ticket)
+        if children != []:
+            self.ticket_edit(
+                ticket, {"estimatedhours" : "0"},
+                "parent_ticket_%s" % ticket)
 
         return children
 
