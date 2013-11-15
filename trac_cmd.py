@@ -282,7 +282,10 @@ Description""" % fil)
         assert ticket and re.search("^[0-9]+$", ticket)
         assert number and re.search("^[0-9]+$", number)
         tickets = self.tph.ticket_split(int(ticket), int(number), use_editor=True)
-        print "Ticket %s split into %s" (ticket, tickets)
+        if tickets != []:
+            print "Ticket %s split into %s" % (ticket, tickets)
+        else:
+            print "Command aborted"
 
     def do_template_edit(self, line):
         if self.tph.template_edit():
