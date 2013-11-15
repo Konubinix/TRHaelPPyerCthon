@@ -143,6 +143,8 @@ class TPH(object):
         return self.ticket_create(ticket_attributes, use_editor)
 
     def ticket_get(self, ticket):
+        if type(ticket) == str:
+            ticket = ticket.replace("#", "")
         return self.server.ticket.get(ticket)
 
     def ticket_close(self, ticket):
