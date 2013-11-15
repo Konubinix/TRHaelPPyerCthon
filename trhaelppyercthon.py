@@ -307,9 +307,6 @@ class TPH(object):
         If one edition is aborted, stop here
         """
         children = []
-        import ipdb
-        ipdb.set_trace()
-
         for i in range(0, number):
             child = self.ticket_son_create(ticket, use_editor=use_editor)
             if not child:
