@@ -67,7 +67,9 @@ class TPH(object):
         return self.server.ticket.create(
             summary,
             description,
-            attributes)
+            attributes,
+            True
+        )
 
     def ticket_clone(self, ticket_number, attributes={}, use_editor=False, reporter=""):
         # get the ticket to clone
