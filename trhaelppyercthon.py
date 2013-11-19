@@ -13,7 +13,13 @@ from attributes import TPHAttributes
 from edit import edit
 
 class TPH(object):
+    """This class provides a level functions on top of trac XML-RPC mechanism.
+
+It contains the special attributes server and attrs that may be changed by the
+user to fit her needs.
+"""
     def __init__(self, server):
+        """Initializes the server to use."""
         self.server = server
         self.attrs = TPHAttributes(
             (
@@ -38,6 +44,7 @@ class TPH(object):
         self.template_attributes = {}
 
     def edit_comment(self, comment="", info="", prefix=""):
+        """Use the edit library to edit the comment of a ticket."""
         info_string = "\n".join([
             "# " + line for line in info.splitlines()
         ])
@@ -53,6 +60,11 @@ class TPH(object):
         return "\n".join(new_comment_lines)
 
     def ticket_create(self, p_attributes, use_editor=False):
+        """Create a new ticket, using p_attributes as set of attributes to set.
+
+If use_editor is set, use the attributes library to edit them before creating
+the ticket.
+"""
         attributes = self.template_attributes.copy()
         attributes.update(p_attributes)
         summary = attributes.get("summary","Summary")
@@ -72,6 +84,13 @@ class TPH(object):
         )
 
     def ticket_clone(self, ticket_number, attributes={}, use_editor=False, reporter=""):
+        """Create a new ticket, copying the attributes from those of
+        ticket_number.
+
+use_editor is given to the call to ticket_create.
+reporter specifies who created the ticket, it defaults to self.me
+attributes overrides some attributes of the ticket before edition
+"""
         # get the ticket to clone
         ticket = self.ticket_get(ticket_number)
         ticket_attributes = ticket[3]
@@ -87,6 +106,12 @@ class TPH(object):
         return self.ticket_create(ticket_attributes, use_editor)
 
     def ticket_son_create(self, ticket_number, attributes={}, use_editor=False, reporter=""):
+        """Create a son ticket of ticket_number.
+
+use_editor is given to the call to ticket_create.
+reporter specifies who created the ticket, it defaults to self.me
+attributes overrides some attributes of the ticket before edition
+"""
         if reporter == "":
             reporter = self.me
         # get the ticket to clone
@@ -111,6 +136,10 @@ class TPH(object):
         return self.ticket_create(ticket_attributes, use_editor)
 
     def ticket_batch_set(self, id_list, attributes):
+        """Set some attributes to a bunch of tickets.
+
+id_list is a list of ticket id
+attributes is a dictionary of attributes to set."""
         for id in id_list:
             self.server.ticket.update(int(id),
                                       "",
@@ -119,6 +148,12 @@ class TPH(object):
                                   )
 
     def ticket_sibling_create(self, ticket_number, attributes, use_editor=False, reporter=""):
+        """Create a sibling ticket of ticket_number.
+
+use_editor is given to the call to ticket_create.
+reporter specifies who created the ticket, it defaults to self.me
+attributes overrides some attributes of the ticket before edition
+"""
         # get the ticket to clone
         ticket = self.ticket_get(ticket_number)
         ticket_old_attributes = ticket[3]
@@ -143,11 +178,13 @@ class TPH(object):
         return self.ticket_create(ticket_attributes, use_editor)
 
     def ticket_get(self, ticket):
+        """Get the ticket, given its id."""
         if type(ticket) == str:
             ticket = ticket.replace("#", "")
         return self.server.ticket.get(ticket)
 
     def ticket_close(self, ticket):
+        """Close the ticket whose id is ticket."""
         content = edit("fixed\n\nComment", prefix=str(ticket) + "_")
         if content == "":
             return False
@@ -165,6 +202,14 @@ class TPH(object):
         return True
 
     def ticket_edit(self, ticket_number, new_attributes={}, name=""):
+        """Edit the ticket attributes.
+
+ticket_number is the id of the ticket to edit
+new_attributes is a dictionary of attributes that will override the ones of the
+        ticket before edition.
+name is a special string used in the name of the temporary file containing the
+        attributes to edit
+"""
         if not name:
             name = str(ticket_number)
         ticket = self.ticket_get(ticket_number)
@@ -187,6 +232,8 @@ class TPH(object):
             return False
 
     def ticket_accept(self, ticket_number, owner):
+        """Change the status of the ticket ticket_number to accepter and the
+        owner to owner."""
         ticket = self.ticket_get(ticket_number)
         attributes = ticket[3]
         attributes["status"] = "accepted"
@@ -211,12 +258,15 @@ class TPH(object):
             return False
 
     def ticket_sons(self, ticket_number):
+        """Returns the sons of the ticket ticket_number."""
         return self.server.ticket.query("parents=~%s" % (ticket_number))
 
     def ticket_parents(self, ticket_number):
+        """Returns the parents of ticket_number."""
         return self.ticket_get(ticket_number)[3]["parents"]
 
     def ticket_remaining_time(self, ticket_number):
+        """Returns the remaining time of ticket_number."""
         ticket = self.ticket_get(ticket_number)
         attributes = ticket[3]
         if attributes["estimatedhours"]:
@@ -226,12 +276,15 @@ class TPH(object):
         return hours
 
     def ticket_remaining_time_sum(self, ticket_number):
+        """Returns the sum of the remaining time of ticket_number and the
+remaining time of all its sons."""
         time = self.ticket_remaining_time(ticket_number)
         for child in self.ticket_sons(ticket_number):
             time += self.ticket_remaining_time_sum(child)
         return time
 
     def ticket_query_time_sum(self, query):
+        """Returns the sum of the remaining time of all tickets matching query."""
         tickets = self.server.ticket.query(query)
         time = 0
         for ticket in tickets:
@@ -240,6 +293,7 @@ class TPH(object):
         return time
 
     def ticket_batch_edit(self, id_list):
+        """Edit a bunch of tickets whose ids are in id_list."""
         for id in id_list:
             ticket = self.ticket_get(id)
             attributes = self.attrs.edit(ticket[3])
@@ -250,10 +304,17 @@ class TPH(object):
                                   )
 
     def ticket_changelog(self, ticket, filter=lambda x:True):
+        """Return the changelog of ticket filtering with the filter argument
+        (defaults to all).
+
+All the entries of the resulting changelog contains contain ticket as first element."""
         cl = self.server.ticket.changeLog(ticket)
         return [[ticket] + l for l in cl if filter([ticket] + l)]
 
     def ticket_recent_changes(self, since, filter=lambda x:True):
+        """Returns recent changes since the since date.
+
+filter may be used to filter the results."""
         tickets = self.server.ticket.getRecentChanges(since)
         created_tickets = self.server.ticket.query(
             "created=%s.." % (since.strftime("%m/%d/%y"))
@@ -276,6 +337,11 @@ class TPH(object):
         return created_tickets_changelogs + changelogs
 
     def ticket_attachment_put(self, ticket, files_desc, override=False):
+        """Attach a set of files to the ticket.
+
+files_desc is a dictionary whose keys are the path to the files to be attached
+        and the values are the descriptions of those files.
+override, if set to true, will override the file if remotely present."""
         attachments = set(self.ticket_attachment_list(ticket))
         files = set([os.path.basename(fil) for fil in files_desc.keys()])
         # make sure the attachments won't be overridden if not precised
@@ -299,6 +365,7 @@ class TPH(object):
         return done_files
 
     def ticket_attachment_list(self, ticket):
+        """List the attachments of ticket."""
         return self.server.ticket.listAttachments(ticket)
 
     def ticket_split(self, ticket, number, use_editor=False):
@@ -321,6 +388,9 @@ class TPH(object):
         return children
 
     def wiki_attachment_put(self, page, file_names, override=False):
+        """Attach a set of files to the wiki page.
+
+override, if set to true, will override the file if remotely present."""
         attachments = set(self.wiki_attachment_list(page))
         # make sure the attachments won't be overridden if not precised
         assert not (attachments.intersection(file_names) and override)
@@ -342,9 +412,12 @@ class TPH(object):
         return done_files
 
     def wiki_attachment_list(self, page):
+        """List the attachment of the wiki page."""
         return self.server.wiki.listAttachments(page)
 
     def template_edit(self):
+        """Edit the ticket template. This template is used each time a ticket is
+        created."""
         attributes = \
                      self.attrs.edit(self.template_attributes)
         if attributes:
@@ -354,6 +427,7 @@ class TPH(object):
             return False
 
     def template_save(self, file_name):
+        """Save the ticket template for later use to file_name."""
         if os.path.exists(file_name):
             "The file %s will be erased"
             os.unlink(file_name)
@@ -363,6 +437,7 @@ class TPH(object):
         return True
 
     def template_open(self, file_name):
+        """Loads the ticket template from file_name."""
         assert os.path.exists(file_name)
         with open(file_name, "r") as file:
             self.template_attributes = self.attrs.load(file.read())
@@ -370,12 +445,16 @@ class TPH(object):
         return True
 
     def component_list(self, filter=lambda x:True):
+        """List the components.
+
+filter may be used to filter the results."""
         return [
             comp for comp in self.server.ticket.component.getAll()
             if filter(comp)
         ]
 
     def milestone_edit(self, milestone_name):
+        """Edit the milestone page for milestone_name."""
         milestone = self.server.ticket.milestone.get(milestone_name)
         desc = milestone["description"]
         new_desc = edit(desc, prefix=milestone_name.replace(" ", "_"))
@@ -391,10 +470,14 @@ class TPH(object):
         return False
 
     def milestone_list(self, filter=lambda x:True):
+        """List the milestones.
+
+filter may be used to filter the results."""
         return [
             milestone for milestone in self.server.ticket.milestone.getAll()
             if filter(milestone)
         ]
 
     def milestone_time_sum(self, milestone_name):
+        """Sum the times of all tickets belonging to milestone_name."""
         return self.ticket_query_time_sum("milestone=%s&status=!closed" % milestone_name)
