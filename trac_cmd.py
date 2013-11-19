@@ -120,14 +120,15 @@ class TracCmd(cmd.Cmd, object):
         ticket_numbers = ticket_numbers.split(" ")
         self._ticket_remaining_time(ticket_numbers)
 
+    def do_ticket_remaining_time_sum(self, ticket_numbers):
+        assert ticket_numbers, "argument cannot be empty"
+        ticket_numbers = ticket_numbers.split(" ")
+        self._ticket_remaining_time(ticket_numbers, True)
+
     def do_ticket_query_remaining_time(self, query):
         assert query, "argument cannot be empty"
         ticket_numbers = self.tph.server.ticket.query(query)
         self._ticket_remaining_time(ticket_numbers)
-
-    def do_ticket_remaining_time_sum(self, ticket_number):
-        assert ticket_number, "argument cannot be empty"
-        print self.tph.ticket_remaining_time_sum(ticket_number)
 
     def do_ticket_recent_changes(self, date_time):
         date = self._parse_date_recent_changes(date_time)
@@ -453,10 +454,13 @@ not closed or not into the milestone"""
             stderr=subprocess.PIPE
         )
 
-    def _ticket_remaining_time(self, ticket_numbers):
+    def _ticket_remaining_time(self, ticket_numbers, sum=False):
         total = 0
         for ticket_number in ticket_numbers:
-            value = self.tph.ticket_remaining_time(ticket_number)
+            if sum:
+                value = self.tph.ticket_remaining_time_sum(ticket_number)
+            else:
+                value = self.tph.ticket_remaining_time(ticket_number)
             total += value
             print ticket_number,value
         if len(ticket_numbers) > 1:
