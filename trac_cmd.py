@@ -77,6 +77,24 @@ python dictionary containing default attributes."""
         else:
             print "Creation aborted"
 
+    def do_ticket_subscribe_dependencies(self, line):
+        content = re.split(" +", line)
+        ticket_number = content[0]
+        if len(content) == 1:
+            persons = [self.me,]
+        else:
+            persons = content[1:]
+        comment = "Added %s in the cc list to trac %s availability for work" % (
+            ", ".join(persons),
+            ticket_number
+        )
+        comment = self.tph.edit_comment(comment)
+        if not comment:
+            print "Subscription aborted"
+            return
+        blockings = self.tph.ticket_subscribe_dependencies(ticket_number, persons, comment, True)
+        print "Added %s into the cc field of tickets %s" % (persons, blockings)
+
     def do_ticket_clone(self, line):
         """Clone a ticket.
 

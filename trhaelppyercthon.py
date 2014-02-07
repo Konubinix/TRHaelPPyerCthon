@@ -83,6 +83,47 @@ the ticket.
             True
         )
 
+    def ticket_subscribe_dependencies(self, ticket_number, persons,
+                                      comment,
+                                      use_editor=False):
+        persons = set(persons)
+        ticket = self.ticket_get(ticket_number)
+        blockings = ticket[3]["blockedby"]
+        blockings_done = []
+        for blocking_number in re.split("[, \t#]+", blockings):
+            blocking = self.ticket_get(blocking_number)
+            blocking_attribute = blocking[3]
+            # make sure persons are put into the ticket cc
+            already_subcribed = set(re.split("[, \t]+", blocking[3]["cc"]))
+            to_add = persons.difference(already_subcribed)
+            if to_add == set():
+                print "%s already in the cc list of %s" % (
+                    persons,
+                    blocking_number
+                )
+                continue
+            new_attributes = {
+                'cc' : "+" + ", ".join(to_add),
+            }
+            if use_editor:
+                new_attributes['description'] = blocking_attribute["description"]
+                new_attributes['summary'] = blocking_attribute["summary"]
+                new_attributes = self.attrs.edit(new_attributes,
+                                                 blocking_number,
+                                                 ignore_empty=True
+                )
+            new_attributes = self.attrs.merge(blocking_attribute,
+                                              new_attributes)
+            new_attributes = self.attrs.filter(new_attributes)
+            if new_attributes:
+                res = self.server.ticket.update(int(blocking_number),
+                                          comment,
+                                          new_attributes,
+                                          True
+                                      )
+                blockings_done.append(blocking_number)
+        return blockings_done
+
     def ticket_clone(self, ticket_number, attributes={}, use_editor=False, reporter=""):
         """Create a new ticket, copying the attributes from those of
         ticket_number.
@@ -215,6 +256,7 @@ name is a special string used in the name of the temporary file containing the
         ticket = self.ticket_get(ticket_number)
         attributes = ticket[3]
         attributes.update(new_attributes)
+
         attributes = self.attrs.edit(attributes, name)
         if attributes:
             attributes_string = self.attrs.dump(attributes)
