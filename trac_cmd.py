@@ -492,7 +492,9 @@ not closed or not into the milestone"""
     def do_wiki_attach_put(self, page_attachs):
         """Attach some files to the wiki page.
 
-The first argument is the wiki page, the remaining ones are the files to attach."""
+The first argument is the wiki page, the remaining ones are the files to attach.
+
+Existing attachments with the same name will be overwritten."""
         args = re.split(" +", page_attachs)
         page = args[0]
         attach_files = args[1:]
