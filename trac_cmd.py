@@ -211,7 +211,7 @@ The first argument of the line is the ticket number to clone, the rest is
         )
         # recent changes do not show created tickets get the created tickets
         # from that time
-        self.last_recent_change_date = datetime.utcnow()
+        self.last_recent_change_date = datetime.today()
         for change in sorted(changes, key=lambda change:change[1]):
             #self.pp.pprint(change)
             self._dump_change(change)
