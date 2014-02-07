@@ -1,5 +1,5 @@
 * TRHaelPPyerCthon: The Happy Trac RPC Python Helper
-  TRHaelPPyerCthon is a set of functions to help you with be fast with trac management. It is basically a wrapper around the awesome [[http://trac-hacks.org/wiki/XmlRpcPlugin][xml rpc plugin for trac]] to perform meaningful tasks in one command.
+  TRHaelPPyerCthon is a set of functions to help you to be fast with trac management. It is basically a wrapper around the awesome [[http://trac-hacks.org/wiki/XmlRpcPlugin][xml rpc plugin for trac]] to perform meaningful tasks in one command.
 
   It is provided with TracCmd, a CLI application using it to have an interactive manipulation of trac.
 
@@ -60,7 +60,6 @@ TRHaelPPyerCthon
         #+BEGIN_SRC sh
           trac_cmd.py
         #+END_SRC
-
 * Configuration
   :LOGBOOK:
   - Captured       [2013-02-18 Mon 17:37]
