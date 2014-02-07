@@ -24,7 +24,12 @@ Tr a       c
 TRHaelPPyerCthon
   #+END_EXAMPLE
   It does not make a lot of sense, but I like it.
-* How to use
+* How to contribute?
+  :LOGBOOK:
+  - Captured       [2014-02-05 Wed 15:28]
+  :END:
+  In my mind, this project is not mature enough to have a real bug report tool. You may yet email me any suggestion of improvement. I accept any kind of patching way: github pull requests, patch in emails (git format-patch is your friend.). Do not hesitate to send me anything that could make the tool better.
+* How to use?
   :LOGBOOK:
   - Captured       [2013-02-17 dim. 12:05]
   :END:
