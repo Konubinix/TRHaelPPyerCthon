@@ -729,7 +729,10 @@ Existing attachments with the same name will be overwritten."""
         elif change[3] == "estimatedhours":
             print "updated estimated hours (%s -> %s)" % (change[4], change[5],)
         elif change[3] == "resolution":
-            print "closed the ticket with reason %s" % (change[5],)
+            if change[5] == "":
+                print "reopened the ticket, removing the reason %s" % (change[4],)
+            else:
+                print "closed the ticket with reason %s" % (change[5],)
         elif change[3] == "owner":
             print "changed owner form %s to %s" % (change[4], change[5],)
         elif change[3] == "keywords":
