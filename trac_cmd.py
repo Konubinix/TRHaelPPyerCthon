@@ -590,6 +590,14 @@ Existing attachments with the same name will be overwritten."""
         """Dump the content of the ticket. Used for debugging."""
         self.pp.pprint(self.tph.ticket_get(int(ticket)))
 
+    def do__interpreter_ticket(self, ticket):
+        """Launch an interpreter with ticket available."""
+        ticket = self.tph.ticket_get(int(ticket))
+        import readline, rlcompleter
+        readline.parse_and_bind("tab: complete")
+        import code
+        code.interact(local=locals())
+
     def do__api(self, ticket):
         """Open the API page with the browser"""
         subprocess.Popen(
