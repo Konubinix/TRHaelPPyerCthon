@@ -17,6 +17,7 @@ class TPHAttributes(object):
         not meant to be edited.
         """
         self.fields = fields
+        self.filter_exception = ["_ts",]
 
     def dump(self, attributes, ignore_empty=False):
         """From a dictionary of attributes, return a string to be edited.
@@ -129,3 +130,11 @@ the attributes work, the value is replaced in the old value by the new one."""
             return result_fields
         else:
             return old
+
+    def filter(self, attributes):
+        """Removing any attribute in attributes that is not in the recognize
+        fields but keep attributes whose key is in self.filter_exception"""
+        return {
+            _key : attributes[_key] for _key in attributes
+            if _key in self.fields or _key in self.filter_exception
+        }
