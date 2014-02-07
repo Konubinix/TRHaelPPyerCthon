@@ -21,25 +21,14 @@ user to fit her needs.
     def __init__(self, server):
         """Initializes the server to use."""
         self.server = server
+        # Initialize the attributes according to what the trac gives me, ignore
+        # the time fields since I don't know yet how to serialize them properly
         self.attrs = TPHAttributes(
-            (
-                'summary',
-                'component',
-                'estimatedhours',
-                'keywords',
-                'cc',
-                'milestone',
-                'owner',
-                'parents',
-                'blockedby',
-                'blocking',
-                'priority',
-                'reporter',
-                'resolution',
-                'startdate',
-                'status',
-                'type',
-            )
+            [
+                attribute["name"] for attribute in
+                server.ticket.getTicketFields()
+                if not "time" in attribute["name"]
+            ]
         )
         self.template_attributes = {}
 
