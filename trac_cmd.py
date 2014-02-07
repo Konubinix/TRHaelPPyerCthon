@@ -519,6 +519,19 @@ Existing attachments with the same name will be overwritten."""
             )
             print "File %s deleted" % attachment
 
+    def do_wiki_attach_get(self, page_attachs):
+        """Get some attachments from the wiki into the current directory. The arguments are the addresses
+        of the attachments to get (in case of conflict, the last file overrides
+        the previous ones)."""
+        attachments = re.split(" +", page_attachs)
+        assert attachments
+        self._wiki_attach_get(attachments)
+
+    def do_wiki_attach_get_from_wiki_page_name(self, wiki_page_name):
+        """Get all the attachment of a wiki page into the current directory."""
+        attachments = self.tph.wiki_attachment_list(wiki_page_name)
+        self._wiki_attach_get(attachments)
+
     def do_method_list(self, line):
         """List the XML RPC available methods. Useful for debugging."""
         for method in self.tph.server.system.listMethods():
@@ -765,6 +778,17 @@ Existing attachments with the same name will be overwritten."""
             assert False, "Cannot parse %s for a date" % date_time
 
         return time
+
+    def _wiki_attach_get(self, attachments):
+        for attachment in attachments:
+            attachment_binary = self.tph.server.wiki.getAttachment(
+                attachment
+            )
+            attachment_name = os.path.basename(attachment)
+            dest_file_name = os.path.join(os.getcwd(), attachment_name)
+            open(attachment_name, "w").write(attachment_binary.data)
+            print "File %s got and written into %s" % (attachment,
+                                                       dest_file_name)
 
     def do_EOF(self, line):
         """EOF command quits the application"""
