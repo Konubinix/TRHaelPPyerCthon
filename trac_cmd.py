@@ -119,9 +119,9 @@ The first argument of the line is the ticket number that will be the parent, the
         """
         (ticket_number, attributes,) = self._ticket_attributes_parse_line(line)
         new_ticket_number = self.tph.ticket_son_create(ticket_number,
+                                                       self.me,
                                                        attributes,
-                                                       True,
-                                                       reporter=self.me)
+                                                       True)
         if new_ticket_number:
             print "Ticket %s, son of %s, created" % (new_ticket_number,
                                                      ticket_number)
@@ -380,7 +380,7 @@ The first argument is the ticket to split, the second one is the number of
         number = args[1]
         assert ticket and re.search("^[0-9]+$", ticket)
         assert number and re.search("^[0-9]+$", number)
-        tickets = self.tph.ticket_split(int(ticket), int(number), use_editor=True)
+        tickets = self.tph.ticket_split(int(ticket), int(number), self.me, use_editor=True)
         if tickets != []:
             print "Ticket %s split into %s" % (ticket, tickets)
         else:

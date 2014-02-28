@@ -137,15 +137,13 @@ attributes overrides some attributes of the ticket before edition
 
         return self.ticket_create(ticket_attributes, use_editor)
 
-    def ticket_son_create(self, ticket_number, attributes={}, use_editor=False, reporter=""):
+    def ticket_son_create(self, ticket_number, reporter, attributes={}, use_editor=False):
         """Create a son ticket of ticket_number.
 
 use_editor is given to the call to ticket_create.
 reporter specifies who created the ticket, it defaults to self.me
 attributes overrides some attributes of the ticket before edition
 """
-        if reporter == "":
-            reporter = self.me
         # get the ticket to clone
         ticket = self.ticket_get(ticket_number)
         ticket_old_attributes = ticket[3]
@@ -401,14 +399,14 @@ override, if set to true, will override the file if remotely present."""
         """List the attachments of ticket."""
         return self.server.ticket.listAttachments(ticket)
 
-    def ticket_split(self, ticket, number, use_editor=False):
+    def ticket_split(self, ticket, number, reporter, use_editor=False):
         """Split the ticket into number subtickets and ask the user to edit each of
         them. Also set the remaining time of ticket to 0.
         If one edition is aborted, stop here
         """
         children = []
         for i in range(0, number):
-            child = self.ticket_son_create(ticket, use_editor=use_editor)
+            child = self.ticket_son_create(ticket, reporter, use_editor=use_editor)
             if not child:
                 break
             children.append(child)
