@@ -22,12 +22,14 @@ user to fit her needs.
         """Initializes the server to use."""
         self.server = server
         # Initialize the attributes according to what the trac gives me, ignore
-        # the time fields since I don't know yet how to serialize them properly
+        # the time fields since I don't know yet how to serialize them
+        # properly. Also, the description is handled differently
         self.attrs = TPHAttributes(
             [
                 attribute["name"] for attribute in
                 server.ticket.getTicketFields()
                 if not "time" in attribute["name"]
+                and not attribute["name"] == "description"
             ]
         )
         self.template_attributes = {}
