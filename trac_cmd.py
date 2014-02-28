@@ -16,6 +16,7 @@ import cmd
 import subprocess
 import tempfile
 import os
+import sys
 import pprint
 import string
 import json
@@ -28,6 +29,8 @@ from datetime import timedelta
 from trhaelppyercthon import TPH
 from attributes import TPHAttributes
 from edit import edit
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 class TracCmd(cmd.Cmd, object):
     def __init__(self, server, login="", url="", template_file="", report_last_time_file=""):
@@ -827,10 +830,14 @@ last_time_file=...
 See the trac_connection library for more information about the server part and
     the documentation of TracCmd for the documentation of last_time_file.
 """
+    configuration_file = os.environ.get("TRAC_CMDRC",
+                   os.path.expanduser("~/.trac_cmdrc.conf"))
+    if not os.path.exists(configuration_file):
+      logging.error("Could not find configuration file %s" % configuration_file)
+      sys.exit(1)
     config = ConfigParser.ConfigParser()
     config.optionxform = str    # keys not converted into lower case
-    config.read(os.environ.get("TRAC_CMDRC",
-                               os.path.expanduser("~/.trac_cmdrc.conf")))
+    config.read(configuration_file)
     url = config.get("server", "url")
     protocol = config.get("server", "protocol")
     trac_path = config.get("server", "trac_path")
