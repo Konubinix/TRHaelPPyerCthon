@@ -3,6 +3,7 @@
 
 import xmlrpclib
 import netrc
+from urllib import unquote, quote
 
 def from_netrc(url, protocol, trac_path):
     """Retrieve connection information from netrc.
@@ -23,8 +24,8 @@ For instance, if connecting to https://somesite/trac/, then url, protocol,
     server = \
              xmlrpclib.ServerProxy(
                  "%(PROTOCOL)s://%(LOGIN)s:%(PASS)s@%(URL)s%(PATH)s/login/xmlrpc"
-                 % {"LOGIN" : login,
-                    "PASS" : password,
+                 % {"LOGIN" : quote(login),
+                    "PASS" : quote(password),
                     "PROTOCOL" : protocol,
                     "PATH" : trac_path,
                     "URL" : url,
