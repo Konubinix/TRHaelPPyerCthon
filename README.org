@@ -105,6 +105,20 @@ TRHaelPPyerCthon
    - Captured       [2013-02-17 dim. 19:20]
    :END:
    [[http://code.google.com/p/tracshell/][tracshell]] seems to do quite the same thing than TracCmd in spirit. I have not dug into its code, but it might already do everything that trhaelppyercthon does, and maybe better. Nevertheless, it does not appear to be maintained anymore and its code it hard to get into.
+* What to do
+** TODO Nicer handling of the EDITOR
+   #+BEGIN_SRC language
+   EDITOR="emacs -nw" trac_cmd.py
+   #+END_SRC
+** TODO Allow the user to provide commands in the command line
+   #+BEGIN_SRC language
+   trac_cmd.py list_methods
+   #+END_SRC
+** TODO Handle wildcards
+   #+BEGIN_SRC language
+   (Cmd) wiki_attach_delete WikiStart/10*0
+   #+END_SRC
+
 * config                                                            :ARCHIVE:
   :LOGBOOK:
   - Captured       [2013-02-17 dim. 11:59]
