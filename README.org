@@ -39,6 +39,8 @@ TRHaelPPyerCthon
       url=www.trac_example.com # url of the trac web server
       trac_path=/trac # path to trac from the web server
       protocol=https # used protocol
+      [report]
+      last_time_file=~/trac_cmd_last_time.picle # file storing information for differential reports
     #+END_SRC
   - When trhaelppyercthon needs the user to edit something, it uses the EDITOR environment variable.
   - The BROWSER environment variable is used by trac_cmd.py to open web pages.
