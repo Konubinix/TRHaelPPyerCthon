@@ -11,7 +11,7 @@
     - allow commands to act on batches of objects (ticket, wiki page etc.).
   - customisable: it should provides hooks to be run in several places to allow the user to adapt it to his needs,
 
-  TRHaelPPyerCthon is first of all a way for me to understand the trac xml rpc plugin. It may be more interesting to take a look at [[http://code.google.com/p/tracshell/][tracshell]] for something better suited to your needs.
+  TRHaelPPyerCthon is first of all a way for me to understand the trac xml rpc plugin.
 
   The name was chosen after the following:
   #+BEGIN_EXAMPLE
@@ -85,7 +85,6 @@ TRHaelPPyerCthon
     login my_login
     password some_password
     #+END_EXAMPLE
-
 * Alternatives
   :LOGBOOK:
   - Captured       [2013-02-17 dim. 19:17]
@@ -99,7 +98,7 @@ TRHaelPPyerCthon
    :LOGBOOK:
    - Captured       [2013-02-17 dim. 19:20]
    :END:
-   [[http://code.google.com/p/tracshell/][tracshell]] seems to do quite the same thing than TracCmd in spirit. I have not dug into its code, but it might already do everything that trhaelppyercthon does, and maybe better.
+   [[http://code.google.com/p/tracshell/][tracshell]] seems to do quite the same thing than TracCmd in spirit. I have not dug into its code, but it might already do everything that trhaelppyercthon does, and maybe better. Nevertheless, it does not appear to be maintained anymore and its code it hard to get into.
 * config                                                            :ARCHIVE:
   :LOGBOOK:
   - Captured       [2013-02-17 dim. 11:59]
