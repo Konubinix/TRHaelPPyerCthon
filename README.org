@@ -49,23 +49,32 @@ TRHaelPPyerCthon
     login my_login
     password some_password
     #+END_EXAMPLE
+* How to install?
+  :PROPERTIES:
+  :ID:       a4449c9b-5af1-42f4-9b01-4dd017bfaca9
+  :END:
+  As usual with python packages
+  #+BEGIN_SRC sh
+    python setup.py install
+  #+END_SRC
 * How to use?
   - Get it from the repository.
-  - Set the PYTHONPATH environment variable to point to the cloned repository.
+  - Either install it via the usual setup.py command (see [[id:a4449c9b-5af1-42f4-9b01-4dd017bfaca9][How to install?]]) or set the PYTHONPATH environment variable to point to the cloned repository.
   - Use it:
     - You can use it in a python script:
       - You can use only the TPH:
-        #+BEGIN_SRC python
-          from trhaelppyercthon import TPH
-          import xmlrpclib
+#+BEGIN_SRC python
+  from tph.trhaelppyercthon import TPH
+  import xmlrpclib
 
-          server = xmlrpclib.ServerProxy("trac_url")
-          tph = TPH(server)
-          tph.edit(135)
-        #+END_SRC
+  server = xmlrpclib.ServerProxy("trac_url")
+  tph = TPH(server)
+  # edit the ticket number 135
+  tph.ticket_edit(135)
+#+END_SRC
       - You can subclass the TracCmd:
-        #+BEGIN_SRC python
-          from trac_cmd import TracCmd
+#+BEGIN_SRC python
+          from tph.trac_cmd import TracCmd
           import xmlrpclib
 
           class MyTracCmd(TracCmd):
@@ -75,13 +84,13 @@ TRHaelPPyerCthon
           server = xmlrpclib.ServerProxy("trac_url")
           cmd = MyTracCmd(server)
           cmd.cmdloop()
-         #+END_SRC
+#+END_SRC
     - Or you can just use trac_cmd.py:
       - Make the environment variable PATH point to the cloned repository
       - launch trac_cmd.py
-        #+BEGIN_SRC sh
+#+BEGIN_SRC sh
           trac_cmd.py
-        #+END_SRC
+#+END_SRC
 * Alternatives
 ** SD
    [[http://search.cpan.org/dist/App-SD/][SD]], the peer-to-peer bug tracker, looks terrific at first glance. Nonetheless, I did not manage to get the trac clone command work and I could not find any help in the irc chan. Moreover, it uses perl, that looks quite hard to read and understand.

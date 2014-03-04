@@ -861,6 +861,3 @@ def main():
             },
             report_last_time_file=last_time_file
         ).cmdloop()
-
-if __name__ == '__main__':
-    main()
