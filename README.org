@@ -60,7 +60,7 @@ TRHaelPPyerCthon
   - Captured       [2013-02-17 dim. 12:05]
   :END:
   - Get it from the repository.
-  - Set the pythonpath environment variable to point to the cloned repository.
+  - Set the PYTHONPATH environment variable to point to the cloned repository.
   - Use it:
     - You can use it in a python script:
       - You can use only the TPH:
@@ -118,7 +118,6 @@ TRHaelPPyerCthon
    #+BEGIN_SRC language
    (Cmd) wiki_attach_delete WikiStart/10*0
    #+END_SRC
-
 * config                                                            :ARCHIVE:
   :LOGBOOK:
   - Captured       [2013-02-17 dim. 11:59]
