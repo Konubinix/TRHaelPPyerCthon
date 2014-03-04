@@ -25,14 +25,8 @@ TRHaelPPyerCthon
   #+END_EXAMPLE
   It does not make a lot of sense, but I like it.
 * How to contribute?
-  :LOGBOOK:
-  - Captured       [2014-02-05 Wed 15:28]
-  :END:
   In my mind, this project is not mature enough to have a real bug report tool. You may yet email me any suggestion of improvement. I accept any kind of patching way: github pull requests, patch in emails (git format-patch is your friend.). Do not hesitate to send me anything that could make the tool better.
 * Configuration
-  :LOGBOOK:
-  - Captured       [2013-02-18 Mon 17:37]
-  :END:
   - You MUST have the TRAC_CMDRC environment variable pointing to a file describing the information needed to connect to the trac project. It is in conf format and looks like
     #+BEGIN_SRC conf
       [server]
@@ -56,9 +50,6 @@ TRHaelPPyerCthon
     password some_password
     #+END_EXAMPLE
 * How to use?
-  :LOGBOOK:
-  - Captured       [2013-02-17 dim. 12:05]
-  :END:
   - Get it from the repository.
   - Set the PYTHONPATH environment variable to point to the cloned repository.
   - Use it:
@@ -92,18 +83,9 @@ TRHaelPPyerCthon
           trac_cmd.py
         #+END_SRC
 * Alternatives
-  :LOGBOOK:
-  - Captured       [2013-02-17 dim. 19:17]
-  :END:
 ** SD
-   :LOGBOOK:
-   - Captured       [2013-02-17 dim. 19:17]
-   :END:
    [[http://search.cpan.org/dist/App-SD/][SD]], the peer-to-peer bug tracker, looks terrific at first glance. Nonetheless, I did not manage to get the trac clone command work and I could not find any help in the irc chan. Moreover, it uses perl, that looks quite hard to read and understand.
 ** tracshell
-   :LOGBOOK:
-   - Captured       [2013-02-17 dim. 19:20]
-   :END:
    [[http://code.google.com/p/tracshell/][tracshell]] seems to do quite the same thing than TracCmd in spirit. I have not dug into its code, but it might already do everything that trhaelppyercthon does, and maybe better. Nevertheless, it does not appear to be maintained anymore and its code it hard to get into.
 * What to do
 ** TODO Nicer handling of the EDITOR
@@ -119,9 +101,6 @@ TRHaelPPyerCthon
    (Cmd) wiki_attach_delete WikiStart/10*0
    #+END_SRC
 * config                                                            :ARCHIVE:
-  :LOGBOOK:
-  - Captured       [2013-02-17 dim. 11:59]
-  :END:
 
 # Local Variables:
 # ispell-dictionary: "british"
