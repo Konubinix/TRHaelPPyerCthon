@@ -158,7 +158,7 @@ The first argument of the line is the ticket number to clone, the rest is
         print self.tph.server.ticket.query(line)
 
     def complete_ticket_query(self, text, line, begidx, endidx):
-        if re.match("^.+=[^&=]*$", line):
+        if re.match("^.+=[^&= ]*$", line):
             # complete on a value
             # find the key
             group = re.match('^.+[ "&]([^ "&]+)=%s$' % text, line)
@@ -840,6 +840,8 @@ Existing attachments with the same name will be overwritten."""
 TracCmd.do_list_milestones = TracCmd.do_milestone_list
 TracCmd.do_list_methods = TracCmd.do_method_list
 TracCmd.do_help_method = TracCmd.do_method_help
+TracCmd.complete_ticket_query_print = TracCmd.complete_ticket_query
+
 
 def get_configuration_options():
     """Get the configuration from a configuration file stored in the filesystem.
