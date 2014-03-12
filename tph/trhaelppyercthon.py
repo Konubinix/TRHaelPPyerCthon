@@ -50,6 +50,14 @@ user to fit her needs.
         ]
         return "\n".join(new_comment_lines)
 
+    def ticket_field_values(self, field_name):
+        fields = self.server.ticket.getTicketFields()
+        values = {
+            field["name"]:field.get("options", [])
+            for field in fields
+        }
+        return values[field_name]
+
     def ticket_create(self, p_attributes, use_editor=False):
         """Create a new ticket, using p_attributes as set of attributes to set.
 
@@ -512,3 +520,7 @@ filter may be used to filter the results."""
     def milestone_time_sum(self, milestone_name):
         """Sum the times of all tickets belonging to milestone_name."""
         return self.ticket_query_time_sum("milestone=%s&status=!closed" % milestone_name)
+
+# Local Variables:
+# python-indent: 4
+# End:

@@ -24,6 +24,7 @@ import trac_connection
 import re
 import pickle
 import shlex
+import readline
 from datetime import datetime
 from datetime import timedelta
 from trhaelppyercthon import TPH
@@ -155,6 +156,29 @@ The first argument of the line is the ticket number to clone, the rest is
         query may be for instance "owner=owner&status=accepted"."""
         assert line, "argument cannot be empty"
         print self.tph.server.ticket.query(line)
+
+    def complete_ticket_query(self, text, line, begidx, endidx):
+        if re.match("^.+=[^&=]*$", line):
+            # complete on a value
+            # find the key
+            group = re.match('^.+[ "&]([^ "&]+)=%s$' % text, line)
+            key = group.group(1)
+            values = [value for value in self.tph.ticket_field_values(key)
+                      if value.startswith(text)
+            ]
+            return values
+        else:
+            # complete on a key
+            # find the key
+            group = re.match("^(.+&)?([^&]*)$", text)
+            prefix = group.group(1) or ""
+            key = group.group(2)
+            keys = [prefix + field for field in self.tph.attrs.fields if
+                    field.startswith(key)]
+            if len(keys) == 1:
+                return [keys[0] + "=", ]
+            else:
+                return keys
 
     def do_ticket_sons(self, ticket_number):
         """Return the list of sons of ticket_number."""
@@ -553,6 +577,10 @@ Existing attachments with the same name will be overwritten."""
         python syntax). Useful for debugging."""
         exec("self.pp.pprint(self.tph.server.%s" % line + ")")
 
+    def do_ticket_field_values(self, field):
+        """Return the possible values for field"""
+        print self.tph.ticket_field_values(field)
+
     def do_iam(self, line):
         """Change who is self.me"""
         self.me = line
@@ -861,3 +889,7 @@ def main():
             },
             report_last_time_file=last_time_file
         ).cmdloop()
+
+# Local Variables:
+# python-indent: 4
+# End:
