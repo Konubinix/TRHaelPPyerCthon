@@ -405,7 +405,7 @@ override, if set to true, will override the file if remotely present."""
 
     def ticket_attachment_list(self, ticket):
         """List the attachments of ticket."""
-        return self.server.ticket.listAttachments(ticket)
+        return [attach[0] for attach in self.server.ticket.listAttachments(ticket)]
 
     def ticket_split(self, ticket, number, reporter, use_editor=False):
         """Split the ticket into number subtickets and ask the user to edit each of
