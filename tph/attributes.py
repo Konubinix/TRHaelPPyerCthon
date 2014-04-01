@@ -33,6 +33,8 @@ class TPHAttributes(object):
         content = ""
         for field in self.fields:
             value = attributes.get(field, "")
+            if value is None:
+              value = ""
             if value or not ignore_empty:
                 content = content + field+"="+value+"\n"
         content = content + attributes.get("description", "")
