@@ -3,6 +3,9 @@
 
 from edit import edit
 import re
+import logging
+logging.basicConfig()
+logger = logging.getLogger(__file__)
 
 class TPHAttributes(object):
     """Class helping the edition of ticket attributes
