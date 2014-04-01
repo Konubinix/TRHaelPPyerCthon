@@ -7,7 +7,7 @@ setup(
     name = 'TRHaelPPyerCthon',
     version = '0.0',
     packages = find_packages(),
-    scripts = ['bin/trac_cmd.py'],
+    scripts = ['bin/trac_cmd.py', 'bin/trac_cmd_trac_hacks.sh', 'bin/trac_cmdrc_trachacks.conf'],
     author = "Konubinix",
     author_email = "konubinix@gmail.com",
     maintainer="Konubinix",
