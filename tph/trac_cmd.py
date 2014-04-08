@@ -621,9 +621,8 @@ Existing attachments with the same name will be overwritten."""
         """Dump the content of the ticket. Used for debugging."""
         self.pp.pprint(self.tph.ticket_get(int(ticket)))
 
-    def do__interpreter_ticket(self, ticket):
-        """Launch an interpreter with ticket available."""
-        ticket = self.tph.ticket_get(int(ticket))
+    def do__interpreter(self, line):
+        """Launch an interpreter."""
         import readline, rlcompleter
         readline.parse_and_bind("tab: complete")
         import code
