@@ -29,8 +29,8 @@ For instance, if connecting to https://somesite/trac/, then url, protocol,
       server = \
                xmlrpclib.ServerProxy(
                  "%(PROTOCOL)s://%(LOGIN)s:%(PASS)s@%(URL)s%(PATH)s/login/xmlrpc"
-                 % {"LOGIN" : quote(login),
-                    "PASS" : quote(password),
+                 % {"LOGIN" : login,
+                    "PASS" : password,
                     "PROTOCOL" : protocol,
                     "PATH" : trac_path,
                     "URL" : url,
