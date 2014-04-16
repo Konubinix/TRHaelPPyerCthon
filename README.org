@@ -96,6 +96,26 @@ TRHaelPPyerCthon
    [[http://search.cpan.org/dist/App-SD/][SD]], the peer-to-peer bug tracker, looks terrific at first glance. Nonetheless, I did not manage to get the trac clone command work and I could not find any help in the irc chan. Moreover, it uses perl, that looks quite hard to read and understand.
 ** tracshell
    [[http://code.google.com/p/tracshell/][tracshell]] seems to do quite the same thing than TracCmd in spirit. I have not dug into its code, but it might already do everything that trhaelppyercthon does, and maybe better. Nevertheless, it does not appear to be maintained anymore and its code it hard to get into.
+* FAQ
+** My password contains special character and netrc does like it, how can I do?
+   Use the provided program quoter.py to urlencode your password.
+   #+BEGIN_SRC sh :results verbatim :exports both
+     echo -n "my#password' with special chÀractÈrs"|./tph/quoter.py
+   #+END_SRC
+
+   #+RESULTS:
+   : my%23password%27%20with%20special%20ch%C3%80ract%C3%88rs
+   And put the result in the password field of your netrc.
+
+   Use quoterback.py to revert the operation if you have to
+   #+BEGIN_SRC sh :results verbatim :exports both
+     echo -n "my#password' with special chÀractÈrs"|./tph/quoter.py|./tph/quoterback.py
+   #+END_SRC
+
+   #+RESULTS:
+   : my#password' with special chÀractÈrs
+
+
 * What to do
 ** TODO Completion on fields
 ** TODO Nicer handling of the EDITOR
