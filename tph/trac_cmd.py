@@ -25,6 +25,11 @@ import re
 import pickle
 import shlex
 import readline
+# setup the readline library not take / as separator
+readline.set_completer_delims(
+    readline.get_completer_delims().replace("/", "")
+)
+
 from datetime import datetime
 from datetime import timedelta
 from trhaelppyercthon import TPH
@@ -32,6 +37,7 @@ from attributes import TPHAttributes
 from edit import edit
 import logging
 logging.basicConfig(level=logging.DEBUG)
+
 
 class TracCmd(cmd.Cmd, object):
     def __init__(self, server, login="", url="", template_file="", report_last_time_file=""):
@@ -516,6 +522,14 @@ not closed or not into the milestone"""
         for attachment in self.tph.wiki_attachment_list(page):
             print attachment
 
+    def complete_wiki_attach_list(self, text, line, begidx, endidx):
+        """Complete the command with wiki pages."""
+        completions = [
+            page
+            for page in self.tph.server.wiki.getAllPages()
+            if page.startswith(text)]
+        return completions
+
     def do_wiki_attach_put(self, page_attachs):
         """Attach some files to the wiki page.
 
@@ -553,6 +567,19 @@ Existing attachments with the same name will be overwritten."""
         attachments = re.split(" +", page_attachs)
         assert attachments
         self._wiki_attach_get(attachments)
+
+    def complete_wiki_attach_get(self, text, line, begidx, endidx):
+        wiki_page_completion = self.complete_wiki_attach_list(text, line, begidx, endidx)
+        # if the text is a full wiki page name, complete with the attachments
+        # also
+        wiki_page = "/".join(text.split("/")[:-1])
+        attachments = [
+            attach
+            for attach in self.tph.wiki_attachment_list(wiki_page)
+            if attach.startswith(text)
+        ]
+        attachments2 = self.tph.wiki_attachment_list(text)
+        return attachments + attachments2 + wiki_page_completion
 
     def do_wiki_attach_get_from_wiki_page_name(self, wiki_page_name):
         """Get all the attachment of a wiki page into the current directory."""
