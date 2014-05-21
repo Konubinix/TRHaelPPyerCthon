@@ -403,6 +403,13 @@ Description""" % fil)
         )
         print "Files attached to the ticket"
 
+    def do_ticket_attach_get(self, ticket_attachs):
+        """Get some attachments from a ticket into the current directory. The
+        arguments are the number of the ticket and the attachment names."""
+        attachments = re.split(" +", ticket_attachs)
+        ticket = attachments.pop(0)
+        self._ticket_attach_get(ticket, attachments)
+
     def do_ticket_split(self, ticket_n_number):
         """Spit ticket in several subtickets.
 
@@ -857,6 +864,16 @@ Existing attachments with the same name will be overwritten."""
             open(attachment_name, "w").write(attachment_binary.data)
             print "File %s got and written into %s" % (attachment,
                                                        dest_file_name)
+
+    def _ticket_attach_get(self, ticket, attachments):
+        for attachment_name in attachments:
+            attachment_binary = self.tph.server.ticket.getAttachment(
+                ticket,
+                attachment_name
+            )
+            open(attachment_name, "w").write(attachment_binary.data)
+            print "File %s got and written into %s" % (attachment_name,
+                                                       attachment_name)
 
     def do_EOF(self, line):
         """EOF command quits the application"""
