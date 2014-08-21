@@ -269,7 +269,7 @@ The first argument of the line is the ticket number to clone, the rest is
         """Display all the tickets whose status is accepted and owner is
         self.me."""
         print "Accepted tickets"
-        self.do_ticket_query("owner=%s&status=accepted" % self.me)
+        self.do_ticket_query_print("owner=%s&status=accepted summary" % self.me)
 
     def do_ticket_mine_pending(self, line):
         """Display all the tickets whose status is either assigned or new and owner is
@@ -277,9 +277,9 @@ The first argument of the line is the ticket number to clone, the rest is
 
         """
         print "Assigned tickets"
-        self.do_ticket_query("owner=%s&status=assigned" % self.me)
+        self.do_ticket_query_print("owner=%s&status=assigned summary" % self.me)
         print "New tickets"
-        self.do_ticket_query("owner=%s&status=new" % self.me)
+        self.do_ticket_query_print("owner=%s&status=new summary" % self.me)
 
     def do_ticket_close(self, ticket):
         """Close the ticket ticket."""
