@@ -407,8 +407,19 @@ Description""" % fil)
         """Get some attachments from a ticket into the current directory. The
         arguments are the number of the ticket and the attachment names."""
         attachments = re.split(" +", ticket_attachs)
-        ticket = attachments.pop(0)
-        self._ticket_attach_get(ticket, attachments)
+        self._ticket_attach_get(attachments)
+
+    def complete_ticket_attach_get(self, text, line, begidx, endidx):
+        if "/" in text:
+            ticket = text.split("/")[0]
+            attach_start = "/".join(text.split("/")[1:])
+            attachments = [
+                attach
+                for attach in self.tph.ticket_attachment_list(ticket)
+                if attach.startswith(attach_start)
+            ]
+            return ["%s/%s" % (ticket, attach) for attach in attachments]
+        return []
 
     def do_ticket_split(self, ticket_n_number):
         """Spit ticket in several subtickets.
@@ -865,8 +876,10 @@ Existing attachments with the same name will be overwritten."""
             print "File %s got and written into %s" % (attachment,
                                                        dest_file_name)
 
-    def _ticket_attach_get(self, ticket, attachments):
-        for attachment_name in attachments:
+    def _ticket_attach_get(self, attachments):
+        for text in attachments:
+            ticket = text.split("/")[0]
+            attachment_name = "/".join(text.split("/")[1:])
             attachment_binary = self.tph.server.ticket.getAttachment(
                 ticket,
                 attachment_name
