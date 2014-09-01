@@ -173,7 +173,10 @@ The first argument of the line is the ticket number to clone, the rest is
         """Perform a ticket query and return the list of matching tickets. The
         query may be for instance "owner=owner&status=accepted"."""
         assert line, "argument cannot be empty"
-        print self.tph.server.ticket.query(line)
+        try:
+            print self.tph.server.ticket.query(line)
+        except xmlrpclib.Fault as e:
+            print e
 
     def complete_ticket_query(self, text, line, begidx, endidx):
         if re.match("^.+=[^&= ]*$", line):
@@ -336,12 +339,24 @@ The first argument of the line is the ticket number to clone, the rest is
         """Print the field of the tickets matching query.
         The first argument is the query, the second argument is the attribute to print.
         """
-        [query, field] = shlex.split(line)
+        query = None
+        field = None
+        try:
+            [query, field] = shlex.split(line)
+        except ValueError as e:
+            print "You must provide exactly 2 arguments"
+            print "see the help for more info"
+            return
         assert field, "Field must be given"
         assert query, "Query must be given"
-        tickets = self.tph.server.ticket.query(query)
-        for ticket in tickets:
-            print ticket, self.tph.ticket_get(ticket)[3][field]
+        try:
+            tickets = self.tph.server.ticket.query(query)
+            for ticket in tickets:
+                print ticket, self.tph.ticket_get(ticket)[3][field]
+        except xmlrpclib.Fault as e:
+            print e
+        except xmlrpclib.Fault as e:
+            print e
 
     def do_ticket_print(self, query):
         """Print the field of the tickets.
