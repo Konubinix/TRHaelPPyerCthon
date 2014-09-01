@@ -25,10 +25,22 @@ import re
 import pickle
 import shlex
 import readline
+
 # setup the readline library not take / as separator
 readline.set_completer_delims(
     readline.get_completer_delims().replace("/", "")
 )
+
+# handle the history
+histfile = os.environ.get("TRAC_CMD_TEMPLATE_FILE",
+                          os.path.expanduser("~/.traccmd_history"))
+try:
+    readline.read_history_file(histfile)
+except IOError:
+    pass
+import atexit
+atexit.register(readline.write_history_file, histfile)
+del histfile
 
 from datetime import datetime
 from datetime import timedelta
