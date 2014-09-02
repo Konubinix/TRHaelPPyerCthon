@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
 """Simple command line interface o trac.
@@ -10,8 +10,8 @@ TracCmd may be used as is, however, it should be inherited from to add commands
 specific to your projects.
 """
 
-import xmlrpclib
-import ConfigParser
+import xmlrpc.client
+import configparser
 import cmd
 import subprocess
 import tempfile
@@ -95,9 +95,9 @@ python dictionary containing default attributes."""
 
         ticket_number = self.tph.ticket_create(attributes, True)
         if ticket_number is not None:
-            print "Ticket %s created" % (ticket_number)
+            print("Ticket %s created" % (ticket_number))
         else:
-            print "Creation aborted"
+            print("Creation aborted")
 
     def do_ticket_subscribe_dependencies(self, line):
         content = re.split(" +", line)
@@ -112,10 +112,10 @@ python dictionary containing default attributes."""
         )
         comment = self.tph.edit_comment(comment)
         if not comment:
-            print "Subscription aborted"
+            print("Subscription aborted")
             return
         blockings = self.tph.ticket_subscribe_dependencies(ticket_number, persons, comment, True)
-        print "Added %s into the cc field of tickets %s" % (persons, blockings)
+        print("Added %s into the cc field of tickets %s" % (persons, blockings))
 
     def do_ticket_clone(self, line):
         """Clone a ticket.
@@ -127,10 +127,10 @@ The first argument of the line is the ticket number to clone, the rest is
         new_ticket_number = self.tph.ticket_clone(ticket_number, attributes,
                                                   True, reporter=self.me)
         if new_ticket_number:
-            print "Ticket %s, clone of %s, created" % (new_ticket_number,
-                                                       ticket_number)
+            print("Ticket %s, clone of %s, created" % (new_ticket_number,
+                                                       ticket_number))
         else:
-            print "Clone ticket not created"
+            print("Clone ticket not created")
 
     def do_ticket_son_create(self, line):
         """Create a son ticket.
@@ -145,10 +145,10 @@ The first argument of the line is the ticket number that will be the parent, the
                                                        attributes,
                                                        True)
         if new_ticket_number:
-            print "Ticket %s, son of %s, created" % (new_ticket_number,
-                                                     ticket_number)
+            print("Ticket %s, son of %s, created" % (new_ticket_number,
+                                                     ticket_number))
         else:
-            print "Creation aborted"
+            print("Creation aborted")
 
     def do_ticket_sibling_create(self, line):
         """Create a sibling of a ticket.
@@ -164,19 +164,19 @@ The first argument of the line is the ticket number to clone, the rest is
             reporter=self.me
         )
         if new_ticket_number:
-            print "Ticket %s, sibling of %s, created" % (new_ticket_number,
-                                                         ticket_number)
+            print("Ticket %s, sibling of %s, created" % (new_ticket_number,
+                                                         ticket_number))
         else:
-            print "Creation aborted"
+            print("Creation aborted")
 
     def do_ticket_query(self, line):
         """Perform a ticket query and return the list of matching tickets. The
         query may be for instance "owner=owner&status=accepted"."""
         assert line, "argument cannot be empty"
         try:
-            print self.tph.server.ticket.query(line)
-        except xmlrpclib.Fault as e:
-            print e
+            print(self.tph.server.ticket.query(line))
+        except xmlrpc.client.Fault as e:
+            print(e)
 
     def complete_ticket_query(self, text, line, begidx, endidx):
         if re.match("^.+=[^&= ]*$", line):
@@ -204,7 +204,7 @@ The first argument of the line is the ticket number to clone, the rest is
     def do_ticket_sons(self, ticket_number):
         """Return the list of sons of ticket_number."""
         assert ticket_number, "argument cannot be empty"
-        print self.tph.ticket_sons(ticket_number)
+        print(self.tph.ticket_sons(ticket_number))
 
     def do_ticket_sons_recursive(self, ticket_number):
         """Return the list of sons of ticket_number and their sons and the sons
@@ -215,16 +215,16 @@ The first argument of the line is the ticket number to clone, the rest is
     def do_ticket_parents(self, ticket_number):
         """Returns the list of parents of ticket_number."""
         assert ticket_number, "argument cannot be empty"
-        print self.tph.ticket_parents(int(ticket_number))
+        print(self.tph.ticket_parents(int(ticket_number)))
 
     def do_ticket_accept(self, ticket_number):
         """Accept ticket_number, that means change the owner to self.me and the
         status to accepted."""
         assert ticket_number, "argument cannot be empty"
         if self.tph.ticket_accept(int(ticket_number), self.me):
-            print "Ticket %s accepted" % ticket_number
+            print("Ticket %s accepted" % ticket_number)
         else:
-            print "Abort the acceptation of the ticket %s" % ticket_number
+            print("Abort the acceptation of the ticket %s" % ticket_number)
 
     def do_ticket_remaining_time(self, ticket_numbers):
         """Display the sum of the remaining times of ticket_numbers."""
@@ -249,7 +249,7 @@ The first argument of the line is the ticket number to clone, the rest is
         """Dump the recent changes of tickets since date_time. If date_time is
         not given, pickel loads it from self.report_last_time_file."""
         date = self._parse_date_recent_changes(date_time)
-        print("Report for date %s" % date)
+        print(("Report for date %s" % date))
         changes = self.tph.ticket_recent_changes(
             date,
             filter=lambda log:not (
@@ -278,12 +278,12 @@ The first argument of the line is the ticket number to clone, the rest is
             date = self.last_recent_change_date
         with open(self.report_last_time_file, "w") as fi:
             pickle.dump(date, fi)
-        print "Recorded the last time of the report at %s" % date.strftime("%d/%m/%y %H:%M:%S")
+        print("Recorded the last time of the report at %s" % date.strftime("%d/%m/%y %H:%M:%S"))
 
     def do_ticket_mine(self, line):
         """Display all the tickets whose status is accepted and owner is
         self.me."""
-        print "Accepted tickets"
+        print("Accepted tickets")
         self.do_ticket_query_print("owner=%s&status=accepted summary" % self.me)
 
     def do_ticket_mine_pending(self, line):
@@ -291,25 +291,25 @@ The first argument of the line is the ticket number to clone, the rest is
         self.me.
 
         """
-        print "Assigned tickets"
+        print("Assigned tickets")
         self.do_ticket_query_print("owner=%s&status=assigned summary" % self.me)
-        print "New tickets"
+        print("New tickets")
         self.do_ticket_query_print("owner=%s&status=new summary" % self.me)
 
     def do_ticket_close(self, ticket):
         """Close the ticket ticket."""
         if self.tph.ticket_close(int(ticket)):
-            print "Closed ticket %s" % (ticket)
+            print("Closed ticket %s" % (ticket))
         else:
-            print "Failed to close ticket"
+            print("Failed to close ticket")
 
     def do_ticket_summary(self, ticket):
         """Dumps the summary of the ticket."""
-        print self.tph.ticket_get(int(ticket))[3]["summary"]
+        print(self.tph.ticket_get(int(ticket))[3]["summary"])
 
     def do_ticket_description(self, ticket):
         """Dumps the description of ticket."""
-        print self.tph.ticket_get(int(ticket))[3]["description"]
+        print(self.tph.ticket_get(int(ticket))[3]["description"])
 
     def do_ticket_search(self, query):
         """Dumps the result of the search of query in tickets."""
@@ -344,19 +344,19 @@ The first argument of the line is the ticket number to clone, the rest is
         try:
             [query, field] = shlex.split(line)
         except ValueError as e:
-            print "You must provide exactly 2 arguments"
-            print "see the help for more info"
+            print("You must provide exactly 2 arguments")
+            print("see the help for more info")
             return
         assert field, "Field must be given"
         assert query, "Query must be given"
         try:
             tickets = self.tph.server.ticket.query(query)
             for ticket in tickets:
-                print ticket, self.tph.ticket_get(ticket)[3][field]
-        except xmlrpclib.Fault as e:
-            print e
-        except xmlrpclib.Fault as e:
-            print e
+                print(ticket, self.tph.ticket_get(ticket)[3][field])
+        except xmlrpc.client.Fault as e:
+            print(e)
+        except xmlrpc.client.Fault as e:
+            print(e)
 
     def do_ticket_print(self, query):
         """Print the field of the tickets.
@@ -367,7 +367,7 @@ The first argument of the line is the ticket number to clone, the rest is
         tickets = items[0:-1]
         field = items[-1]
         for ticket in tickets:
-            print ticket, self.tph.ticket_get(ticket)[3][field]
+            print(ticket, self.tph.ticket_get(ticket)[3][field])
 
     def do_ticket_query_edit_batch(self, query):
         """Batch edit all the tickets matching query."""
@@ -398,11 +398,11 @@ The first argument of the line is the ticket number to clone, the rest is
 
     def do_ticket_query_time_sum(self, query):
         """Displays the sum of the remaining time of all tickets matching query."""
-        print self.tph.ticket_query_time_sum(query)
+        print(self.tph.ticket_query_time_sum(query))
 
     def do_ticket_attach_list(self, ticket):
         """Display all the attachments of ticket."""
-        print self.tph.ticket_attachment_list(ticket)
+        print(self.tph.ticket_attachment_list(ticket))
 
     def do_ticket_attach_put(self, ticket_attachs):
         """Add an attachment to a ticket.
@@ -419,16 +419,16 @@ The first argument is the ticket, the remaining arguments are the files to attac
 
 Description""" % fil)
             if not desc:
-                print "Attachment put aborted"
+                print("Attachment put aborted")
                 return
             match = re.search("^[^\n]+\n\n(.+)$", desc)
             desc = match.group(1)
             files[fil] = desc
-        print self.tph.ticket_attachment_put(
+        print(self.tph.ticket_attachment_put(
             ticket,
             files
-        )
-        print "Files attached to the ticket"
+        ))
+        print("Files attached to the ticket")
 
     def do_ticket_attach_get(self, ticket_attachs):
         """Get some attachments from a ticket into the current directory. The
@@ -460,16 +460,16 @@ The first argument is the ticket to split, the second one is the number of
         assert number and re.search("^[0-9]+$", number)
         tickets = self.tph.ticket_split(int(ticket), int(number), self.me, use_editor=True)
         if tickets != []:
-            print "Ticket %s split into %s" % (ticket, tickets)
+            print("Ticket %s split into %s" % (ticket, tickets))
         else:
-            print "Command aborted"
+            print("Command aborted")
 
     def do_template_edit(self, line):
         """Edit the ticket template."""
         if self.tph.template_edit():
-            print "Edited template"
+            print("Edited template")
         else:
-            print "Edition aborted"
+            print("Edition aborted")
 
     def do_template_save(self, filename):
         """Save the ticket template of the location provided by
@@ -479,9 +479,9 @@ The first argument is the ticket to split, the second one is the number of
                 "You should provide the template file or set TRAC_CMD_TEMPLATE_FILE"
             filename = self.template_file
         if self.tph.template_save(filename):
-            print "Template file saved in %s" % (filename,)
+            print("Template file saved in %s" % (filename,))
         else:
-            print "Template file not saved"
+            print("Template file not saved")
 
     def do_template_open(self, filename):
         """Loads the template file from filename."""
@@ -490,26 +490,26 @@ The first argument is the ticket to split, the second one is the number of
                 "You should provide the template file or set TRAC_CMD_TEMPLATE_FILE"
             filename = self.template_file
         if self.tph.template_open(filename):
-            print "Template file %s loaded" % (filename,)
+            print("Template file %s loaded" % (filename,))
         else:
-            print "Template file not loaded"
+            print("Template file not loaded")
 
     def do_milestone_edit(self, milestone_name):
         """Edit the content of the milestone."""
         if self.tph.milestone_edit(milestone_name):
-            print "Milestone %s edited" % milestone_name
+            print("Milestone %s edited" % milestone_name)
         else:
-            print "Edition aborted of milestone %s" % milestone_name
+            print("Edition aborted of milestone %s" % milestone_name)
 
     def do_milestone_list(self, match):
         """List the milestones."""
         filter = lambda x:re.search(match, x, re.I)
         for milestone in self.tph.milestone_list(filter):
-            print milestone
+            print(milestone)
 
     def do_milestone_remaining_time_sum(self, milestone_name):
         """Display the remaining time of the milestone_name."""
-        print self.tph.milestone_time_sum(milestone_name)
+        print(self.tph.milestone_time_sum(milestone_name))
 
     def do_milestone_stuck_p(self, milestone_name):
         """The milestone is stuck if one of its tickets is blocked by a tickets
@@ -523,9 +523,9 @@ not closed or not into the milestone"""
                 blocking_ticket = self.tph.ticket_get(int(blocking_ticket_number))
                 if blocking_ticket[3]["status"] != "closed" \
                    and blocking_ticket[3]["milestone"] != milestone_name:
-                    print "%s is blocked by %s not in current milestone" % (
+                    print("%s is blocked by %s not in current milestone" % (
                         ticket_number, blocking_ticket_number
-                    )
+                    ))
 
     def do_wiki_search(self, query):
         """Print the result of the search of query into the wiki"""
@@ -538,13 +538,13 @@ not closed or not into the milestone"""
 
     def do_list_attachment(self, ticket):
         """List the attachments of ticket"""
-        print self.tph.server.ticket.listAttachments(int(ticket))
+        print(self.tph.server.ticket.listAttachments(int(ticket)))
 
     def do_list_components(self, match):
         """Prints the list of components."""
         filter = lambda x:re.search(match, x, re.I)
         for comp in self.tph.component_list(filter):
-            print comp
+            print(comp)
 
     def do_list_resolution(self, line):
         """Print the list of the resolutions."""
@@ -565,7 +565,7 @@ not closed or not into the milestone"""
     def do_wiki_attach_list(self, page):
         """Print the list of files attached to the wiki page."""
         for attachment in self.tph.wiki_attachment_list(page):
-            print attachment
+            print(attachment)
 
     def complete_wiki_attach_list(self, text, line, begidx, endidx):
         """Complete the command with wiki pages."""
@@ -587,11 +587,11 @@ Existing attachments with the same name will be overwritten."""
         assert attach_files
         files = {}
 
-        print self.tph.wiki_attachment_put(
+        print(self.tph.wiki_attachment_put(
             page,
             attach_files
-        )
-        print "Files attached to the page"
+        ))
+        print("Files attached to the page")
 
     def do_wiki_attach_delete(self, page_attachs):
         """Delete some attachments from the wiki. The arguments are the addresses
@@ -603,7 +603,7 @@ Existing attachments with the same name will be overwritten."""
             self.tph.server.wiki.deleteAttachment(
                 attachment
             )
-            print "File %s deleted" % attachment
+            print("File %s deleted" % attachment)
 
     def do_wiki_attach_get(self, page_attachs):
         """Get some attachments from the wiki into the current directory. The arguments are the addresses
@@ -634,15 +634,15 @@ Existing attachments with the same name will be overwritten."""
     def do_method_list(self, line):
         """List the XML RPC available methods. Useful for debugging."""
         for method in self.tph.server.system.listMethods():
-            print method
+            print(method)
 
     def do_method_help(self, method):
         """Prints the help of an XML RPC method. Useful for debugging."""
-        print self.tph.server.system.methodHelp(method)
+        print(self.tph.server.system.methodHelp(method))
 
     def do_get_actions(self, ticket):
         """List the availables actions to perform on a ticket. Useful for debugging."""
-        print self.tph.server.ticket.getActions(int(ticket))
+        print(self.tph.server.ticket.getActions(int(ticket)))
 
     def do_verbatim(self, line):
         """Call the XML RPT method like if directly called on the server (in
@@ -651,7 +651,7 @@ Existing attachments with the same name will be overwritten."""
 
     def do_ticket_field_values(self, field):
         """Return the possible values for field"""
-        print self.tph.ticket_field_values(field)
+        print(self.tph.ticket_field_values(field))
 
     def do_iam(self, line):
         """Change who is self.me"""
@@ -659,7 +659,7 @@ Existing attachments with the same name will be overwritten."""
 
     def do_whoami(self, line):
         """Prints the content of self.me"""
-        print self.me
+        print(self.me)
 
     def do_ticket_web(self, tickets):
         """Open the tickets in the web browser."""
@@ -719,22 +719,22 @@ Existing attachments with the same name will be overwritten."""
             else:
                 value = self.tph.ticket_remaining_time(ticket_number)
             total += value
-            print ticket_number,value
+            print(ticket_number,value)
         if len(ticket_numbers) > 1:
-            print "---"
-            print "Total :",total
+            print("---")
+            print("Total :",total)
 
     def _ticket_edit(self, ticket_numbers):
         """Open tickets for edition."""
         total = len(ticket_numbers)
-        print "%s tickets to edit" % total
+        print("%s tickets to edit" % total)
         for ticket_number in ticket_numbers:
-            print "Editing ticket %s" % ticket_number
+            print("Editing ticket %s" % ticket_number)
             if self.tph.ticket_edit(int(ticket_number)):
                 total -= 1
-                print "Ticket %s edited, %s left" % (ticket_number, total)
+                print("Ticket %s edited, %s left" % (ticket_number, total))
             else:
-                print "Edition aborted"
+                print("Edition aborted")
 
     def _ticket_edit_batch(self, ticket_numbers):
         """Open tickets for batch edition."""
@@ -744,20 +744,20 @@ Existing attachments with the same name will be overwritten."""
         }
         attributes = self.tph.attrs.edit(attributes, prefix="merge_attributes_")
         if not attributes:
-            print "Abort edition"
+            print("Abort edition")
             return
         comment = edit("Comment")
         if not comment:
-            print "Aborting due to empty comment"
+            print("Aborting due to empty comment")
             return
         for ticket_number in ticket_numbers:
-            print "Editing ticket %s" % ticket_number
-            print "Merging attributes"
+            print("Editing ticket %s" % ticket_number)
+            print("Merging attributes")
             ticket = self.tph.ticket_get(ticket_number)
             new_attributes = self.tph.attrs.merge(ticket[3], attributes, True)
             # handle the special case where nothing has changed
             if new_attributes == ticket[3]:
-                print "Nothing to do for ticket %s" % ticket_number
+                print("Nothing to do for ticket %s" % ticket_number)
             else:
                 if self.tph.server.ticket.update(
                         ticket_number,
@@ -765,9 +765,9 @@ Existing attachments with the same name will be overwritten."""
                         new_attributes,
                         True
                 ):
-                    print "Ticket %s edited" % (ticket_number)
+                    print("Ticket %s edited" % (ticket_number))
                 else:
-                    print "Failed to edit ticket %s" % (ticket_number)
+                    print("Failed to edit ticket %s" % (ticket_number))
 
     def _ticket_attributes_parse_line(self, line):
         '''Ex: 72 {"summary":"New ticket"}'''
@@ -811,48 +811,48 @@ Existing attachments with the same name will be overwritten."""
             date_tuble.tm_min,
             date_tuble.tm_sec
         )
-        print "  At %s" % (date.strftime("%d/%m/%y %H:%M:%S"),)
-        print "%s" % change[2],
-        print "Ticket : %s" % change[0],
+        print("  At %s" % (date.strftime("%d/%m/%y %H:%M:%S"),))
+        print("%s" % change[2], end=' ')
+        print("Ticket : %s" % change[0], end=' ')
         if re.search("comment", change[3]):
-            print "Added/Edited comment : %s" % change[5].splitlines()[0]
+            print("Added/Edited comment : %s" % change[5].splitlines()[0])
         elif change[3] == "description":
-            print "changed the description of the ticket"
+            print("changed the description of the ticket")
         elif change[3] == "created":
-            print "created the ticket"
+            print("created the ticket")
         elif change[3] == "component":
-            print "moved the component from %s to %s" % (change[4], change[5],)
+            print("moved the component from %s to %s" % (change[4], change[5],))
         elif change[3] == "summary":
-            print "updated summary : %s" % (change[5],)
+            print("updated summary : %s" % (change[5],))
         elif change[3] == "blocking":
-            print "update blocking from %s to %s" % (change[4], change[5],)
+            print("update blocking from %s to %s" % (change[4], change[5],))
         elif change[3] == "status":
-            print "changed the status from %s to %s" % (change[4], change[5],)
+            print("changed the status from %s to %s" % (change[4], change[5],))
         elif change[3] == "estimatedhours":
-            print "updated estimated hours (%s -> %s)" % (change[4], change[5],)
+            print("updated estimated hours (%s -> %s)" % (change[4], change[5],))
         elif change[3] == "resolution":
             if change[5] == "":
-                print "reopened the ticket, removing the reason %s" % (change[4],)
+                print("reopened the ticket, removing the reason %s" % (change[4],))
             else:
-                print "closed the ticket with reason %s" % (change[5],)
+                print("closed the ticket with reason %s" % (change[5],))
         elif change[3] == "owner":
-            print "changed owner form %s to %s" % (change[4], change[5],)
+            print("changed owner form %s to %s" % (change[4], change[5],))
         elif change[3] == "keywords":
-            print "changed keywords form %s to %s" % (change[4], change[5],)
+            print("changed keywords form %s to %s" % (change[4], change[5],))
         elif change[3] == "milestone":
-            print "changed milestone form %s to %s" % (change[4], change[5],)
+            print("changed milestone form %s to %s" % (change[4], change[5],))
         elif change[3] == "parents":
-            print "changed parents form %s to %s" % (change[4], change[5],)
+            print("changed parents form %s to %s" % (change[4], change[5],))
         elif change[3] == "priority":
-            print "changed priority form %s to %s" % (change[4], change[5],)
+            print("changed priority form %s to %s" % (change[4], change[5],))
         elif change[3] == "score":
-            print "changed score form %s to %s" % (change[4], change[5],)
+            print("changed score form %s to %s" % (change[4], change[5],))
         else:
             self.pp.pprint(change)
 
     def _ticket_sons_recursive(self, ticket_number, indent):
         """Prints a hierarchy of tickets."""
-        print indent + str(ticket_number)
+        print(indent + str(ticket_number))
         for son in self.tph.ticket_sons(ticket_number):
             self._ticket_sons_recursive(son, indent + "  ")
 
@@ -900,8 +900,8 @@ Existing attachments with the same name will be overwritten."""
             attachment_name = os.path.basename(attachment)
             dest_file_name = os.path.join(os.getcwd(), attachment_name)
             open(attachment_name, "w").write(attachment_binary.data)
-            print "File %s got and written into %s" % (attachment,
-                                                       dest_file_name)
+            print("File %s got and written into %s" % (attachment,
+                                                       dest_file_name))
 
     def _ticket_attach_get(self, attachments):
         for text in attachments:
@@ -912,8 +912,8 @@ Existing attachments with the same name will be overwritten."""
                 attachment_name
             )
             open(attachment_name, "w").write(attachment_binary.data)
-            print "File %s got and written into %s" % (attachment_name,
-                                                       attachment_name)
+            print("File %s got and written into %s" % (attachment_name,
+                                                       attachment_name))
 
     def do_EOF(self, line):
         """EOF command quits the application"""
@@ -948,7 +948,7 @@ See the trac_connection library for more information about the server part and
     if not os.path.exists(configuration_file):
       logging.error("Could not find configuration file %s" % configuration_file)
       sys.exit(1)
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
     config.optionxform = str    # keys not converted into lower case
     config.read(configuration_file)
     url = config.get("server", "url")
@@ -965,7 +965,7 @@ def main():
      url,
      trac_path,
      last_time_file) = get_configuration_options()
-    TracCmd(server,
+    program = TracCmd(server,
             login=login,
             url="%(PROTOCOL)s://%(URL)s%(PATH)s" % {
                 "PROTOCOL" : protocol,
@@ -973,7 +973,11 @@ def main():
                 "PATH" : trac_path,
             },
             report_last_time_file=last_time_file
-        ).cmdloop()
+        )
+    program.cmdloop()
+
+if __name__ == '__main__':
+    main()
 
 # Local Variables:
 # python-indent: 4

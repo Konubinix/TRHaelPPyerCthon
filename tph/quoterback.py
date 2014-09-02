@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
 import sys
-from urllib import unquote
+from urllib.parse import unquote
 
-print unquote(sys.stdin.read()),
+print(unquote(sys.stdin.read()), end=' ')

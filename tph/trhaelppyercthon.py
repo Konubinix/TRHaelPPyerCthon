@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
 import netrc
@@ -7,7 +7,7 @@ import subprocess
 import datetime
 import os
 import re
-import xmlrpclib
+import xmlrpc.client
 
 from attributes import TPHAttributes
 from edit import edit
@@ -96,10 +96,10 @@ the ticket.
             already_subcribed = set(re.split("[, \t]+", blocking[3]["cc"]))
             to_add = persons.difference(already_subcribed)
             if to_add == set():
-                print "%s already in the cc list of %s" % (
+                print("%s already in the cc list of %s" % (
                     persons,
                     blocking_number
-                )
+                ))
                 continue
             new_attributes = {
                 'cc' : "+" + ", ".join(to_add),
@@ -348,7 +348,7 @@ remaining time of all its sons."""
 
 All the entries of the resulting changelog contains contain ticket as first element."""
         cl = self.server.ticket.changeLog(ticket)
-        return [[ticket] + l for l in cl if filter([ticket] + l)]
+        return [[ticket] + l for l in cl if list(filter([ticket] + l))]
 
     def ticket_recent_changes(self, since, filter=lambda x:True):
         """Returns recent changes since the since date.
@@ -358,7 +358,7 @@ filter may be used to filter the results."""
         created_tickets = self.server.ticket.query(
             "created=%s.." % (since.strftime("%m/%d/%y"))
         )
-        new_filter = lambda log:filter(log) and since <= log[1]
+        new_filter = lambda log:list(filter(log)) and since <= log[1]
         # from the created tickets. Retrieve only those that have been created
         # after since
         created_tickets_changelogs = []
@@ -382,7 +382,7 @@ files_desc is a dictionary whose keys are the path to the files to be attached
         and the values are the descriptions of those files.
 override, if set to true, will override the file if remotely present."""
         attachments = set(self.ticket_attachment_list(ticket))
-        files = set([os.path.basename(fil) for fil in files_desc.keys()])
+        files = set([os.path.basename(fil) for fil in list(files_desc.keys())])
         # make sure the attachments won't be overridden if not precised
         assert not (attachments.intersection(files) and override)
         done_files = []
@@ -397,7 +397,7 @@ override, if set to true, will override the file if remotely present."""
                     ticket,
                     basename,
                     files_desc[fil],
-                    xmlrpclib.Binary(content),
+                    xmlrpc.client.Binary(content),
                     True
                 )
             )
@@ -445,7 +445,7 @@ override, if set to true, will override the file if remotely present."""
                 page,
                 basename,
                 "",
-                xmlrpclib.Binary(content),
+                xmlrpc.client.Binary(content),
             )
             done_files.append(path)
         return done_files
@@ -489,7 +489,7 @@ override, if set to true, will override the file if remotely present."""
 filter may be used to filter the results."""
         return [
             comp for comp in self.server.ticket.component.getAll()
-            if filter(comp)
+            if list(filter(comp))
         ]
 
     def milestone_edit(self, milestone_name):
@@ -514,7 +514,7 @@ filter may be used to filter the results."""
 filter may be used to filter the results."""
         return [
             milestone for milestone in self.server.ticket.milestone.getAll()
-            if filter(milestone)
+            if list(filter(milestone))
         ]
 
     def milestone_time_sum(self, milestone_name):

@@ -1,9 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-import xmlrpclib
+import xmlrpc.client
 import netrc
-from urllib import unquote, quote
+from urllib.parse import unquote, quote
 import logging
 logging.basicConfig()
 logger = logging.getLogger(__file__)
@@ -27,7 +27,7 @@ For instance, if connecting to https://somesite/trac/, then url, protocol,
       logger.info("Using authenticated rpc")
       (login, account, password) = authentication
       server = \
-               xmlrpclib.ServerProxy(
+               xmlrpc.client.ServerProxy(
                  "%(PROTOCOL)s://%(LOGIN)s:%(PASS)s@%(URL)s%(PATH)s/login/xmlrpc"
                  % {"LOGIN" : login,
                     "PASS" : password,
@@ -40,7 +40,7 @@ For instance, if connecting to https://somesite/trac/, then url, protocol,
       logger.warn("Using visitor rpc since no authentication provided")
       login = None
       server = \
-               xmlrpclib.ServerProxy(
+               xmlrpc.client.ServerProxy(
                  "%(PROTOCOL)s://%(URL)s%(PATH)s/rpc"
                  % {
                     "PROTOCOL" : protocol,

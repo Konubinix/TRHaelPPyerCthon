@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
 from edit import edit
@@ -102,7 +102,7 @@ class TPHAttributes(object):
         """Add the information of new attributes into the old ones. For most of
 the attributes work, the value is replaced in the old value by the new one."""
         result_fields = {}
-        for key in new.keys():
+        for key in list(new.keys()):
             if key in ("keywords", "cc"):
                 if new[key] == "":
                     new_values = set()
