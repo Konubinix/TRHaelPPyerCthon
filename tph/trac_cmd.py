@@ -337,22 +337,26 @@ The first argument of the line is the ticket number to clone, the rest is
 
     def do_ticket_query_print(self, line):
         """Print the field of the tickets matching query.
-        The first argument is the query, the second argument is the attribute to print.
+
+        The first argument is the query, the remaining arguments are the
+        attributes to print.
+
         """
         query = None
-        field = None
+        fields = None
         try:
-            [query, field] = shlex.split(line)
+            [query, *fields] = shlex.split(line)
         except ValueError as e:
-            print("You must provide exactly 2 arguments")
+            print("You must provide at least 2 arguments")
             print("see the help for more info")
             return
-        assert field, "Field must be given"
+        assert fields, "Fields must be given"
         assert query, "Query must be given"
         try:
             tickets = self.tph.server.ticket.query(query)
             for ticket in tickets:
-                print(ticket, self.tph.ticket_get(ticket)[3][field])
+                values = [str(self.tph.ticket_get(ticket)[3][field]) for field in fields]
+                print( "|".join( [str(ticket),] + values ) )
         except xmlrpc.client.Fault as e:
             print(e)
         except xmlrpc.client.Fault as e:
