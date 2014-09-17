@@ -25,6 +25,7 @@ import re
 import pickle
 import shlex
 import readline
+import glob
 
 # setup the readline library not take / as separator
 readline.set_completer_delims(
@@ -55,6 +56,12 @@ def safe_to_int(value):
         return int(value)
     except:
         return 0
+
+def glob_them(files):
+    res = []
+    for file in files:
+        res += glob.glob(file)
+    return res
 
 class TracCmd(cmd.Cmd, object):
     def __init__(self, server, login="", url="", template_file="", report_last_time_file=""):
@@ -436,6 +443,7 @@ The first argument is the ticket, the remaining arguments are the files to attac
         assert re.search("^[0-9]+$", ticket)
         attach_files = args[1:]
         assert attach_files
+        attach_files = glob_them(attach_files)
         files = {}
         for fil in attach_files:
             desc = edit("""%s
@@ -608,6 +616,7 @@ Existing attachments with the same name will be overwritten."""
         page = args[0]
         attach_files = args[1:]
         assert attach_files
+        attach_files = glob_them(attach_files)
         files = {}
 
         print(self.tph.wiki_attachment_put(
