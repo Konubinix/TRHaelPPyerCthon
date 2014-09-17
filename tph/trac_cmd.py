@@ -50,6 +50,11 @@ from .edit import edit
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
+def safe_to_int(value):
+    try:
+        return int(value)
+    except:
+        return 0
 
 class TracCmd(cmd.Cmd, object):
     def __init__(self, server, login="", url="", template_file="", report_last_time_file=""):
@@ -66,6 +71,7 @@ report_last_time_file, the location of a file storing the last time the ticket
 """
         cmd.Cmd.__init__(self)
         self.tph = TPH(server)
+        self._ticket_order = None
         self.me = login
         self.pp = pprint.PrettyPrinter(indent=4)
         self.url = url
@@ -335,6 +341,15 @@ The first argument of the line is the ticket number to clone, the rest is
         tickets = self.tph.server.ticket.query(query)
         self._ticket_edit(tickets)
 
+    def do_ticket_order(self, line):
+        """A lambda expression to match the key of the ticket when printing.
+        Default to None
+        """
+        if line == "":
+            print(self._ticket_order)
+        else:
+            self._ticket_order = line
+
     def do_ticket_query_print(self, line):
         """Print the field of the tickets matching query.
 
@@ -354,9 +369,13 @@ The first argument of the line is the ticket number to clone, the rest is
         assert query, "Query must be given"
         try:
             tickets = self.tph.server.ticket.query(query)
+            tickets = [self.tph.ticket_get(ticket) for ticket in tickets]
+            if self._ticket_order:
+                sorter = eval("lambda x:" + self._ticket_order)
+                tickets.sort(key=lambda x:sorter(x[3]))
             for ticket in tickets:
-                values = [str(self.tph.ticket_get(ticket)[3][field]) for field in fields]
-                print( "|".join( [str(ticket),] + values ) )
+                values = [str(ticket[3].get(field, "None")) for field in fields]
+                print( "|".join( [str(ticket[0]),] + values ) )
         except xmlrpc.client.Fault as e:
             print(e)
         except xmlrpc.client.Fault as e:
