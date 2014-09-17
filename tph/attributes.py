@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-from edit import edit
+from .edit import edit
 import re
 import logging
 logging.basicConfig()

@@ -20,7 +20,7 @@ import sys
 import pprint
 import string
 import json
-import trac_connection
+from . import trac_connection
 import re
 import pickle
 import shlex
@@ -44,9 +44,9 @@ del histfile
 
 from datetime import datetime
 from datetime import timedelta
-from trhaelppyercthon import TPH
-from attributes import TPHAttributes
-from edit import edit
+from .trhaelppyercthon import TPH
+from .attributes import TPHAttributes
+from .edit import edit
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
@@ -979,9 +979,6 @@ def main():
             report_last_time_file=last_time_file
         )
     program.cmdloop()
-
-if __name__ == '__main__':
-    main()
 
 # Local Variables:
 # python-indent: 4

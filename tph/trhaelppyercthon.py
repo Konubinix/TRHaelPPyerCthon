@@ -9,8 +9,8 @@ import os
 import re
 import xmlrpc.client
 
-from attributes import TPHAttributes
-from edit import edit
+from .attributes import TPHAttributes
+from .edit import edit
 
 class TPH(object):
     """This class provides a level functions on top of trac XML-RPC mechanism.

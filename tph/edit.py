@@ -21,8 +21,8 @@ def edit(content, suffix=".wiki", prefix=""):
     rc = subprocess.call([os.environ["EDITOR"], temp_file.name])
     if rc == 0:
         # get the new content and return it
-        with open(temp_file.name, "r") as tfile:
-            new_content = tfile.read().decode("utf-8")
+        with open(temp_file.name, "r", encoding="utf-8") as tfile:
+            new_content = tfile.read()
     else:
         new_content = None
 
