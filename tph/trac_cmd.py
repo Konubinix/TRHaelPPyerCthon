@@ -27,9 +27,9 @@ import shlex
 import readline
 import glob
 
-# setup the readline library not take / as separator
+# setup the readline library so that it dos not take / and - as separator
 readline.set_completer_delims(
-    readline.get_completer_delims().replace("/", "")
+    readline.get_completer_delims().replace("/", "").replace("-", "")
 )
 
 # handle the history
