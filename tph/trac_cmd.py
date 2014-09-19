@@ -931,7 +931,7 @@ Existing attachments with the same name will be overwritten."""
             )
             attachment_name = os.path.basename(attachment)
             dest_file_name = os.path.join(os.getcwd(), attachment_name)
-            open(attachment_name, "w").write(attachment_binary.data)
+            open(attachment_name, "wb").write(attachment_binary.data)
             print("File %s got and written into %s" % (attachment,
                                                        dest_file_name))
 
