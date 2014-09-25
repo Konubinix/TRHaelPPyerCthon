@@ -489,7 +489,7 @@ override, if set to true, will override the file if remotely present."""
 filter may be used to filter the results."""
         return [
             comp for comp in self.server.ticket.component.getAll()
-            if list(filter(comp))
+            if filter(comp)
         ]
 
     def milestone_edit(self, milestone_name):
