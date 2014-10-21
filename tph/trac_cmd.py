@@ -404,27 +404,56 @@ The first argument of the line is the ticket number to clone, the rest is
         tickets = self.tph.server.ticket.query(query)
         self._ticket_edit_batch(tickets)
 
+    def _ticket_changelog(self, line, filter):
+        ticket_number, *lines = shlex.split(line)
+        if len(lines) > 1:
+            print("Must not provide more than 2 arguments")
+            return
+        if len(lines) == 1:
+            lines = lines[0]
+        else:
+            lines = "10"
+        changelog = self.tph.ticket_changelog(
+            ticket_number,
+            filter=filter
+        )
+        changelog.reverse()
+        if lines != "0":
+            if "-" in lines:
+                changelog = changelog[int(lines):]
+            else:
+                changelog = changelog[:int(lines)]
+        changelog.reverse()
+        for change in changelog:
+            self._dump_change(change)
+
     def do_ticket_changelog(self, line):
         """Args: ticket number_of_changes
         number_of_changes default to 10
         number_of_changes set to 0 means no limit
+        a negative value goes from the beginning
         """
-        match = re.match(" *([0-9]+)( +([0-9]+))?", line)
-        ticket_number = match.group(1)
-        lines = match.group(3) or "10"
-        changelog = self.tph.ticket_changelog(
-            ticket_number,
-            filter=lambda log:not (
+        self._ticket_changelog(
+            line,
+            # remove empty comments
+            lambda log:not (
                 log[3] == "comment" \
                 and log[5] == ""
-            )
-        )
-        changelog.reverse()
-        if lines != "0":
-            changelog = changelog[:int(lines)]
-        changelog.reverse()
-        for change in changelog:
-            self._dump_change(change)
+            ))
+
+    def do_ticket_comments(self, line):
+        """Args: ticket number_of_changes
+        number_of_comments default to 10
+        number_of_comments set to 0 means no limit
+        a negative value goes from the beginning
+        """
+        self._ticket_changelog(
+            line,
+            # show only comments
+            lambda log:(
+                log[3] == "comment" \
+                and not log[5] == ""
+            ))
 
     def do_ticket_query_time_sum(self, query):
         """Displays the sum of the remaining time of all tickets matching query."""
