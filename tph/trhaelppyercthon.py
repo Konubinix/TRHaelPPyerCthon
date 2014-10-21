@@ -348,7 +348,7 @@ remaining time of all its sons."""
 
 All the entries of the resulting changelog contains contain ticket as first element."""
         cl = self.server.ticket.changeLog(ticket)
-        return [[ticket] + l for l in cl if list(filter([ticket] + l))]
+        return [[ticket] + l for l in cl if filter([ticket] + l)]
 
     def ticket_recent_changes(self, since, filter=lambda x:True):
         """Returns recent changes since the since date.
@@ -358,7 +358,7 @@ filter may be used to filter the results."""
         created_tickets = self.server.ticket.query(
             "created=%s.." % (since.strftime("%m/%d/%y"))
         )
-        new_filter = lambda log:list(filter(log)) and since <= log[1]
+        new_filter = lambda log:filter(log) and since <= log[1]
         # from the created tickets. Retrieve only those that have been created
         # after since
         created_tickets_changelogs = []
@@ -514,7 +514,7 @@ filter may be used to filter the results."""
 filter may be used to filter the results."""
         return [
             milestone for milestone in self.server.ticket.milestone.getAll()
-            if list(filter(milestone))
+            if filter(milestone)
         ]
 
     def milestone_time_sum(self, milestone_name):
