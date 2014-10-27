@@ -872,7 +872,7 @@ Existing attachments with the same name will be overwritten."""
             date_tuble.tm_min,
             date_tuble.tm_sec
         )
-        print("  At %s" % (date.strftime("%d/%m/%y %H:%M:%S"),))
+        print("##  At %s" % (date.strftime("%d/%m/%y %H:%M:%S"),))
         print("%s" % change[2], end=' ')
         print("Ticket : %s" % change[0], end=' ')
         if re.search("comment", change[3]):
