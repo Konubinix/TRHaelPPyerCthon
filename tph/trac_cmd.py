@@ -404,7 +404,7 @@ The first argument of the line is the ticket number to clone, the rest is
         tickets = self.tph.server.ticket.query(query)
         self._ticket_edit_batch(tickets)
 
-    def _ticket_changelog(self, line, filter):
+    def _ticket_changelog(self, line, filter, long=False):
         ticket_number, *lines = shlex.split(line)
         if len(lines) > 1:
             print("Must not provide more than 2 arguments")
@@ -425,7 +425,7 @@ The first argument of the line is the ticket number to clone, the rest is
                 changelog = changelog[:int(lines)]
         changelog.reverse()
         for change in changelog:
-            self._dump_change(change)
+            self._dump_change(change, long)
 
     def do_ticket_changelog(self, line):
         """Args: ticket number_of_changes
@@ -453,7 +453,9 @@ The first argument of the line is the ticket number to clone, the rest is
             lambda log:(
                 log[3] == "comment" \
                 and not log[5] == ""
-            ))
+            ),
+            True
+        )
 
     def do_ticket_query_time_sum(self, query):
         """Displays the sum of the remaining time of all tickets matching query."""
@@ -861,7 +863,7 @@ Existing attachments with the same name will be overwritten."""
             date = datetime(month=1, year=1970, day=1)
         return date
 
-    def _dump_change(self, change):
+    def _dump_change(self, change, long=False):
         """Dump a change returned by the ticket.changeLog XML RPC method."""
         date_tuble = change[1].timetuple()
         date = datetime(
@@ -876,7 +878,11 @@ Existing attachments with the same name will be overwritten."""
         print("%s" % change[2], end=' ')
         print("Ticket : %s" % change[0], end=' ')
         if re.search("comment", change[3]):
-            print("Added/Edited comment : %s" % change[5].splitlines()[0])
+            if long:
+                value = change[5]
+            else:
+                value = change[5].splitlines()[0]
+            print("Added/Edited comment : %s" % value)
         elif change[3] == "description":
             print("changed the description of the ticket")
         elif change[3] == "created":
