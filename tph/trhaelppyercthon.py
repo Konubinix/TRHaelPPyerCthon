@@ -8,6 +8,7 @@ import datetime
 import os
 import re
 import xmlrpc.client
+import fnmatch
 
 from .attributes import TPHAttributes
 from .edit import edit
@@ -453,6 +454,18 @@ override, if set to true, will override the file if remotely present."""
     def wiki_attachment_list(self, page):
         """List the attachment of the wiki page."""
         return self.server.wiki.listAttachments(page)
+
+    def wiki_source_grep(self, page_pattern, grep_pattern):
+        """Allows to search for content into the sources of pages."""
+        pages = [page for page in self.server.wiki.getAllPages() if
+                 fnmatch.fnmatch(page, page_pattern)]
+        for page in pages:
+            content = self.server.wiki.getPage(page)
+            line_number = 0
+            for line in content.splitlines():
+                line_number+=1
+                if re.search(grep_pattern, line):
+                    yield (page, line_number, line)
 
     def template_edit(self):
         """Edit the ticket template. This template is used each time a ticket is

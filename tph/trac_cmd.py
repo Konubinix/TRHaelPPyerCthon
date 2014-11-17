@@ -598,6 +598,14 @@ not closed or not into the milestone"""
             )
         )
 
+    def do_wiki_source_grep(self, line):
+        """Search for content into the sources of pages."""
+        (page_pattern, grep_pattern,) = shlex.split(line)
+        for matches in self.tph.wiki_source_grep(page_pattern, grep_pattern):
+            print("{}:{} {}".format(
+                *matches
+            ))
+
     def do_list_attachment(self, ticket):
         """List the attachments of ticket"""
         print(self.tph.server.ticket.listAttachments(int(ticket)))
