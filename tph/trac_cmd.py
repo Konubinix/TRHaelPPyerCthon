@@ -26,6 +26,7 @@ import pickle
 import shlex
 import readline
 import glob
+import socket
 
 # setup the readline library so that it dos not take / and - as separator
 readline.set_completer_delims(
@@ -78,6 +79,7 @@ report_last_time_file, the location of a file storing the last time the ticket
 """
         cmd.Cmd.__init__(self)
         self.tph = TPH(server)
+
         self._ticket_order = None
         self.me = login
         self.pp = pprint.PrettyPrinter(indent=4)
@@ -1022,6 +1024,18 @@ See the trac_connection library for more information about the server part and
                    os.path.expanduser("~/.trac_cmdrc.conf"))
     if not os.path.exists(configuration_file):
       logging.error("Could not find configuration file %s" % configuration_file)
+      logging.error("""Try writing in {} something like:
+[server]
+# url of the trac web server
+url=www.trac_example.com
+# path to trac from the web server
+trac_path=/trac
+# used protocol
+protocol=https
+[report]
+# file storing information for differential reports
+last_time_file=~/trac_cmd_last_time.picle
+      """.format(configuration_file))
       sys.exit(1)
     config = configparser.ConfigParser()
     config.optionxform = str    # keys not converted into lower case

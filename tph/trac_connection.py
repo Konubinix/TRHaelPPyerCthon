@@ -5,6 +5,7 @@ import xmlrpc.client
 import netrc
 from urllib.parse import unquote, quote
 import logging
+import socket
 logging.basicConfig()
 logger = logging.getLogger(__file__)
 
@@ -48,4 +49,12 @@ For instance, if connecting to https://somesite/trac/, then url, protocol,
                     "URL" : url,
                   }
                )
+
+    try:
+      # try anything to make sure the connection is OK
+      server.system.listMethods()
+    except socket.gaierror as error:
+      if error.errno == -2:
+        print("Cannot connect to: {}".format(server))
+
     return (login, server,)
