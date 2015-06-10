@@ -994,7 +994,7 @@ Existing attachments with the same name will be overwritten."""
                 ticket,
                 attachment_name
             )
-            open(attachment_name, "w").write(attachment_binary.data)
+            open(attachment_name, "wb").write(attachment_binary.data)
             print("File %s got and written into %s" % (attachment_name,
                                                        attachment_name))
 
