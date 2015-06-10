@@ -1069,6 +1069,12 @@ def main():
             },
             report_last_time_file=last_time_file
         )
+    if len(sys.argv) > 1:
+        program.onecmd(sys.argv[1] + " " + " ".join([
+            "'{}'".format(arg)
+            for arg in sys.argv[2:]
+        ]))
+        sys.exit(0)
     program.cmdloop()
 
 # Local Variables:
