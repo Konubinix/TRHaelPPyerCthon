@@ -774,6 +774,11 @@ Existing attachments with the same name will be overwritten."""
         import code
         code.interact(local=locals())
 
+    def do_ipython(self, line):
+        """Launch an interpreter."""
+        import IPython
+        IPython.start_ipython(argv=[], user_ns=locals())
+
     def do__api(self, ticket):
         """Open the API page with the browser"""
         subprocess.Popen(
