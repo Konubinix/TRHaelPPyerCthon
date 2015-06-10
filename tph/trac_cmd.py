@@ -115,7 +115,7 @@ python dictionary containing default attributes."""
             print("Creation aborted")
 
     def do_ticket_subscribe_dependencies(self, line):
-        content = re.split(" +", line)
+        content = shlex.split(line)
         ticket_number = content[0]
         if len(content) == 1:
             persons = [self.me,]
@@ -394,7 +394,7 @@ The first argument of the line is the ticket number to clone, the rest is
         """Print the field of the tickets.
         The first arguments are the list of tickets, the last argument is the attribute to print.
         """
-        items = re.split(" +", query)
+        items = shlex.split(query)
         assert len(items) > 1
         tickets = items[0:-1]
         field = items[-1]
@@ -471,7 +471,7 @@ The first argument of the line is the ticket number to clone, the rest is
         """Add an attachment to a ticket.
 The first argument is the ticket, the remaining arguments are the files to attach.
 """
-        args = re.split(" +", ticket_attachs)
+        args = shlex.split(ticket_attachs)
         ticket = args[0]
         assert re.search("^[0-9]+$", ticket)
         attach_files = args[1:]
@@ -495,9 +495,10 @@ Description""" % fil)
         print("Files attached to the ticket")
 
     def do_ticket_attach_get(self, ticket_attachs):
-        """Get some attachments from a ticket into the current directory. The
-        arguments are the number of the ticket and the attachment names."""
-        attachments = re.split(" +", ticket_attachs)
+        """Get some attachments from a ticket into the current directory.
+        ticket_attach_get 47/file.avi 234/file.csv
+"""
+        attachments = shlex.split(ticket_attachs)
         self._ticket_attach_get(attachments)
 
     def complete_ticket_attach_get(self, text, line, begidx, endidx):
@@ -517,7 +518,7 @@ Description""" % fil)
 
 The first argument is the ticket to split, the second one is the number of
         subtickets. The created tickets are subtickets of the initial one."""
-        args = re.split(" +", ticket_n_number)
+        args = shlex.split(ticket_n_number)
         ticket = args[0]
         number = args[1]
         assert ticket and re.search("^[0-9]+$", ticket)
@@ -653,7 +654,7 @@ not closed or not into the milestone"""
 The first argument is the wiki page, the remaining ones are the files to attach.
 
 Existing attachments with the same name will be overwritten."""
-        args = re.split(" +", page_attachs)
+        args = shlex.split(page_attachs)
         page = args[0]
         attach_files = args[1:]
         assert attach_files
@@ -669,7 +670,7 @@ Existing attachments with the same name will be overwritten."""
     def do_wiki_attach_delete(self, page_attachs):
         """Delete some attachments from the wiki. The arguments are the addresses
         of the attachments to delete."""
-        attachments = re.split(" +", page_attachs)
+        attachments = shlex.split(page_attachs)
         assert attachments
 
         for attachment in attachments:
@@ -682,7 +683,7 @@ Existing attachments with the same name will be overwritten."""
         """Get some attachments from the wiki into the current directory. The arguments are the addresses
         of the attachments to get (in case of conflict, the last file overrides
         the previous ones)."""
-        attachments = re.split(" +", page_attachs)
+        attachments = shlex.split(page_attachs)
         assert attachments
         self._wiki_attach_get(attachments)
 
@@ -736,7 +737,7 @@ Existing attachments with the same name will be overwritten."""
 
     def do_ticket_web(self, tickets):
         """Open the tickets in the web browser."""
-        tickets = re.split(" +", tickets)
+        tickets = shlex.split(tickets)
         for ticket in tickets:
             url="%(URL)s/ticket/%(TICKET)s" % {
                 "URL" : self.url,
