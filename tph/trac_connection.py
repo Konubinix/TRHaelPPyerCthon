@@ -6,7 +6,6 @@ import netrc
 from urllib.parse import unquote, quote
 import logging
 import socket
-logging.basicConfig()
 logger = logging.getLogger(__file__)
 
 def from_netrc(url, protocol, trac_path):
@@ -27,16 +26,14 @@ For instance, if connecting to https://somesite/trac/, then url, protocol,
     if authentication:
       logger.info("Using authenticated rpc")
       (login, account, password) = authentication
-      server = \
-               xmlrpc.client.ServerProxy(
-                 "%(PROTOCOL)s://%(LOGIN)s:%(PASS)s@%(URL)s%(PATH)s/login/xmlrpc"
-                 % {"LOGIN" : login,
-                    "PASS" : password,
-                    "PROTOCOL" : protocol,
-                    "PATH" : trac_path,
-                    "URL" : url,
-                  }
-               )
+      conn_url = "%(PROTOCOL)s://%(LOGIN)s:%(PASS)s@%(URL)s%(PATH)s/login/xmlrpc" % {"LOGIN" : login,
+                                                                                "PASS" : password,
+                                                                                "PROTOCOL" : protocol,
+                                                                                "PATH" : trac_path,
+                                                                                "URL" : url,
+      }
+      #logger.debug(conn_url)
+      server = xmlrpc.client.ServerProxy(conn_url)
     else:
       logger.warn("Using visitor rpc since no authentication provided")
       login = None
