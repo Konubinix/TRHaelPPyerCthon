@@ -12,7 +12,6 @@ setup(
     author_email = "konubinix@gmail.com",
     maintainer="Konubinix",
     maintainer_email="konubinix@gmail.com",
-    install_requires = ["ConfigParser", "xmlrpclib"],
     description = """The Happy Trac RPC Python Helper.
 
 TRHaelPPyerCthon is a set of functions to help you to be fast with trac
